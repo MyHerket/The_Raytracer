@@ -20,7 +20,6 @@ vec3 color(const ray& r) {
     float t = hit_sphere(vec3(0.0, 0.0, -1.0), 0.5, r);
     if (t > 0.0) {
         vec3 N = unit_vector(r.point_at_parameter(t) - vec3(0.0, 0.0, -1.0));
-        if (r.direction() == vec3(0.0, 0.0, -1.0)) return vec3(0.0, 0.5, 0.5);
         //Es necesario agregar esto que es para cuando el normal apunta exactamente al origen del raytracer
         return 0.5 * vec3(N.x() + 1.0, N.y() + 1.0, N.z() + 1.0); 
     }

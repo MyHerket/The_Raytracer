@@ -142,5 +142,6 @@ inline bool operator==(const vec3& v1, const vec3& v2){
 }
 
 inline vec3 unit_vector(vec3 v) {
+	if (v.lenght() == 0.0) return vec3(1.0, 0.0, 0.0); 
 	return v / v.lenght();
 }
