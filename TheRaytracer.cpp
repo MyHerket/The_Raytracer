@@ -62,7 +62,8 @@ int main()
             int ir = int(255.99 * col[0]);
             int ig = int(255.99 * col[1]);
             int ib = int(255.99 * col[2]);
-            file << ir << " " << ig << " " << ib << std::endl;
+            vec3 pix_col(ir, ig, ib);
+            file <<pix_col << std::endl;
         }
     }
 }
