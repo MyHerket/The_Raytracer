@@ -20,7 +20,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Vec3_Class.h">
+    <ClInclude Include="ray.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="vec3.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
   </ItemGroup>

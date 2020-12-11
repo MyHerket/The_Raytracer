@@ -142,7 +142,8 @@
     <ClCompile Include="TheRaytracer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Vec3_Class.h" />
+    <ClInclude Include="ray.h" />
+    <ClInclude Include="vec3.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
