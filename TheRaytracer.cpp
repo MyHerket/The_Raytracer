@@ -2,6 +2,7 @@
 //
 
 #include <iostream>
+#inclide "Vec3_Class.h"
 
 int main()
 {
