@@ -143,9 +143,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="color.h" />
     <ClInclude Include="hitable.h" />
     <ClInclude Include="ray.h" />
     <ClInclude Include="hitable_list.h" />
+    <ClInclude Include="rtweekend.h" />
     <ClInclude Include="vec3.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

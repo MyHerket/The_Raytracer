@@ -4,19 +4,20 @@
 #include <iostream>
 #include <fstream>
 #include <cfloat>
-#include "hitable_list.h"
+
+#include "rtweekend.h"
 #include "Camera.h"
 
-vec3 color(const ray& r, hitable* world) {
+color ray_color(const ray& r, const hitable& world) {
     hit_record rec; 
-    if (world->hit(r, 0.0, FLT_MAX, rec)) {
-        return 0.5 * vec3(rec.normal.x() + 1.0, rec.normal.y() + 1.0, rec.normal.z() + 1.0);
+    if (world.hit(r, 0.0, infinity, rec)) {
+        return 0.5 * (rec.normal + color(1.0, 1.0, 1.0));
     }
     else {
         // Esto pone el fondo. En este caso es un degradado horizontal.
         vec3 unit_direction = unit_vector(r.direction());
-        float t = 0.5 * (unit_direction.y() + 1.0);
-        return (1.0 - t) * vec3(1.0, 1.0, 1.0) + t * vec3(0.5, 0.7, 1.0);
+        auto t = 0.5 * (unit_direction.y() + 1.0);
+        return (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0);
         //vec3(0,0,0) = Blanco
         //vec3(0.5, 0.7, 1) = Azul Así que obtenemos un degradado de azul a blanco de arriba a abajo
     }
@@ -24,40 +25,46 @@ vec3 color(const ray& r, hitable* world) {
 
 int main()
 {
-    int nx = 200; 
-    int ny = 100;
-    int ns = 100;
+    //Setup image
+    const auto aspect_ratio = 16.0 / 9.0;
+    int image_width = 400; 
+    int image_height = static_cast<int>(image_width/aspect_ratio);
+    int samples_per_pixel = 100;
+
+    //Setup Camera
+    camera cam;
+
+    //World
+    hitable_list world;
+    world.add(make_shared<sphere>(point3(0.0, 0.0, -1.0), 0.5));
+    world.add(make_shared<sphere>(point3(0.0, -100.5, -1.0), 100.0));
+
+
+    //Render
+
     std::ofstream file("image.ppm"); 
     if (!file.is_open()) {
         std::cout << "Error de apertura de archivo\n";
         return 0;
     }
 
-    file << "P3\n" << nx << " " << ny << "\n255" << std::endl; 
+    file << "P3\n" << image_width << " " << image_height << "\n255" << std::endl; 
     
-    hitable* list[2]; 
-    list[0] = new sphere(vec3(-0.7, 0, -1), 0.5);
-    list[1] = new sphere(vec3(0, -100.5, -1.5), 100); 
-    hitable* world = new hitable_list(list, 2);
-    camera cam;
-
-    for (int j = ny - 1; j >= 0; j--) {
-        for (int i = 0; i < nx; i++) {
-            vec3 col(0.0, 0.0, 0.0);
-            for (int s = 0; s < ns; s++) {
-                float u = float(i + float(rand() % 100) / 100.0) / float(nx);
-                float v = float(j + float(rand() % 100) / 100.0) / float(ny);
+    for (int j = image_height - 1; j >= 0; j--) {
+        std::cout << "\rScanlines remaining: " << j << " " << std::flush;
+        for (int i = 0; i < image_width; i++) {
+            color pixel_color(0.0, 0.0, 0.0);
+            for (int s = 0; s < samples_per_pixel; ++s) {
+                auto u = double(i) / double(image_width - 1.0);
+                auto v = double(j) / double(image_height - 1.0);
                 ray r = cam.get_ray(u, v);
-                vec3 p = r.point_at_parameter(2.0);
-                col += color(r, world);
+                pixel_color += ray_color(r, world);
             }
-
-            col /= float(ns);
-            int ir = int(255.99 * col[0]);
-            int ig = int(255.99 * col[1]);
-            int ib = int(255.99 * col[2]);
-            vec3 pix_col(ir, ig, ib);
-            file <<pix_col << std::endl;
+            write_color(file, pixel_color, samples_per_pixel);
+          
         }
     }
+
+    std::cout << "\nDone\n";
 }
+
