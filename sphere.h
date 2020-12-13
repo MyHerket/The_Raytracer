@@ -39,8 +39,8 @@ bool sphere::hit(const ray& r, double tmin, double tmax, hit_record& rec) const 
     rec.set_face_normal(r, outward_normal);
 
     return true;
-}*/
-
+}
+ */
 #ifndef SPHEREH 
 #define SPHEREH
 
