@@ -18,127 +18,108 @@ public:
 	  double y() const { return e[1]; }
 	  double z() const { return e[2]; }
 
-	  const vec3& operator+() const { return *this; }
 	  vec3 operator-()const { return vec3(-e[0], -e[1], -e[2]); }
 	  double operator[](int i) const { return e[i]; }
 	  double& operator[](int i) { return e[i]; }
 
-	  vec3& operator+=(const vec3& v2);
-	  vec3& operator-=(const vec3& v2);
-	  vec3& operator*=(const vec3& v2);
-	  vec3& operator/=(const vec3& v2);
-	  vec3& operator*=(const double t);
-	  vec3& operator/=(const double t);
+	  //Sobrecarga de operadores
+	  vec3& operator+=(const vec3& v2) {
+		  e[0] += v2.e[0];
+		  e[1] += v2.e[1];
+		  e[2] += v2.e[2];
+		  return *this;
+	  }
+
+	  vec3& operator*=(const double t) {
+		  e[0] *= t; 
+		  e[1] *= t;
+		  e[2] *= t; 
+		  return *this;
+	  }
+
+	  vec3& operator/=(const double t) {
+		  return *this *= 1 / t;
+	  }
+
 
 	  double lenght() const {
-		return sqrt(e[0] * e[0] + e[1] * e[1] + e[2] * e[2]);	}
+		return sqrt(lenght_squared());	}
 	  double lenght_squared() const {
 		return e[0] * e[0] + e[1] * e[1] + e[2] * e[2];	}
 	  void make_unit_vector();
 
+	  inline static vec3 random() {
+		  return vec3(random_double(), random_double(), random_double());
+	  }
+
+	  inline static vec3 random(double min, double max) {
+		  return vec3(random_double(min, max), random_double(min, max), random_double(min, max));
+	  }
+
 	double e[3];
 };
 
-  std::istream& operator>>(std::istream& is, vec3& t) {
+
+// vec3 Utility functions 
+
+  inline std::istream& operator>>(std::istream& is, vec3& t) {
 	is >> t.e[0] >> t.e[1] >> t.e[2];
 	return is;
 }
 
-  std::ostream& operator<<(std::ostream& os, vec3& t) {
+ inline std::ostream& operator<<(std::ostream& os, vec3& t) {
 	os << t.e[0]<< " " << t.e[1] << " " << t.e[2];
 	return os;
 }
 
+  //revisar
+
   void vec3::make_unit_vector() {
-	  if (e[0] * e[0] + e[1] * e[1] + e[2] * e[2] != 0) {
-		  double k = 1.0 / sqrt(e[0] * e[0] + e[1] * e[1] + e[2] * e[2]);
+	  if (e[0] + e[1] + e[2] != 0) {
+		  double k = 1.0 / lenght();
 		  e[0] *= k;
 		  e[1] *= k;
 		  e[2] *= k;
 	}
 }
 
-  vec3 operator+(const vec3& v1, const vec3& v2) {
+  inline vec3 operator+(const vec3& v1, const vec3& v2) {
 	return vec3(v1.e[0] + v2.e[0], v1.e[1] + v2.e[1], v1.e[2] + v2.e[2]);
 }
 
-  vec3 operator-(const vec3& v1, const vec3& v2) {
+  inline vec3 operator-(const vec3& v1, const vec3& v2) {
 	return vec3(v1.e[0] - v2.e[0], v1.e[1] - v2.e[1], v1.e[2] - v2.e[2]);
 }
 
-  vec3 operator*(const vec3& v1, const vec3& v2) {
+  inline vec3 operator*(const vec3& v1, const vec3& v2) {
 	return vec3(v1.e[0] * v2.e[0], v1.e[1] * v2.e[1], v1.e[2] * v2.e[2]);
 }
 
-  vec3 operator/(const vec3& v1, const vec3& v2) {
+  inline vec3 operator/(const vec3& v1, const vec3& v2) {
 	return vec3(v1.e[0] / v2.e[0], v1.e[1] / v2.e[1], v1.e[2] / v2.e[2]);
 }
 
-  vec3 operator*(double t, const vec3& v2) {
+  inline vec3 operator*(double t, const vec3& v2) {
 	return vec3(t * v2.e[0], t * v2.e[1], t * v2.e[2]);
 }
 
 
-  vec3 operator*(const vec3& v2, double t) {
-	return vec3(t * v2.e[0], t * v2.e[1], t * v2.e[2]);
+  inline vec3 operator*(const vec3& v2, double t) {
+	  return t * v2;
 }
 
-  vec3 operator/(vec3 v2, double t) {
-	return vec3(v2.e[0]/t, v2.e[1]/t, v2.e[2]/t);
+  inline vec3 operator/(vec3 v2, double t) {
+	  return (1 / t) * v2;
 }
 
-  double dot(const vec3& v1, const vec3& v2) {
+  inline double dot(const vec3& v1, const vec3& v2) {
 	return v1.e[0] * v2.e[0] + v1.e[1] * v2.e[1] + v1.e[2] * v2.e[2];
 }
 
   vec3 cross(const vec3& v1, const vec3& v2) {
-	return vec3((v1.e[1] * v2.e[2] - v1.e[2] * v2.e[1]),
-		-(v1.e[0] * v2.e[2] - v1.e[2] * v2.e[0]),
-		(v1.e[0] * v2.e[1] - v1.e[1] * v2.e[0]));
-}
-
-  vec3& vec3::operator+=(const vec3& v) {
-	e[0] += v.e[0];
-	e[1] += v.e[1];
-	e[2] += v.e[2];
-	return *this;
-}
-
-  vec3& vec3::operator*=(const vec3& v) {
-	e[0] *= v.e[0]; 
-	e[1] *= v.e[1];
-	e[2] *= v.e[2];
-	return *this;
-}
-
-  vec3& vec3::operator/=(const vec3& v) {
-	e[0] /= v.e[0];
-	e[1] /= v.e[1];
-	e[2] /= v.e[2];
-	return *this;
-}
-
-  vec3& vec3::operator-=(const vec3& v) {
-	e[0] -= v.e[0];
-	e[1] -= v.e[1];
-	e[2] -= v.e[2];
-	return *this;
-}
-
-  vec3& vec3::operator*=(const double t) {
-	e[0] *= t;
-	e[1] *= t;
-	e[2] *= t;
-	return *this;
-}
-
-  vec3& vec3::operator/=(const double t) {
-	double k = 1.0 / t;
-
-	e[0] *= k;
-	e[1] *= k;
-	e[2] *= k;
-	return *this;
+	  return vec3((v1.e[1] * v2.e[2] - v1.e[2] * v2.e[1]),
+				  -(v1.e[0] * v2.e[2]) + v1.e[2] * v2.e[0],
+				  (v1.e[0] * v2.e[1] - v1.e[1] * v2.e[0]));
 }
 
 
@@ -147,9 +128,18 @@ public:
 }
 
   vec3 unit_vector(vec3 v) {
-	if (v.lenght() == 0.0) return vec3(1.0, 0.0, 0.0); 
+	if (v.lenght() == 0.0) return v; 
 	return v / v.lenght();
 }
+
+
+  vec3 random_in_unit_sphere() {
+	  while (true) {
+		  auto p = vec3::random(-1, 1);
+		  if (p.lenght_squared() >= 1) continue; 
+		  return p;
+	  }
+  }
 
   using point3 = vec3; 
   using color = vec3;

@@ -148,6 +148,7 @@
     <ClInclude Include="ray.h" />
     <ClInclude Include="hitable_list.h" />
     <ClInclude Include="rtweekend.h" />
+    <ClInclude Include="sphere.h" />
     <ClInclude Include="vec3.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
