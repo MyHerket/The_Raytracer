@@ -56,6 +56,12 @@ public:
 		  return vec3(random_double(min, max), random_double(min, max), random_double(min, max));
 	  }
 
+	  bool near_zero() {
+		  //Return true if the vector is close to zero in all dimensions.
+		  const auto s = 1e-8; 
+		  return(fabs(e[0]) < s) && (fabs(e[1]) < s) && (fabs(e[2]) < s);
+	  }
+
 	double e[3];
 };
 
@@ -151,6 +157,10 @@ public:
 		  return in_unit_sphere;
 	  else
 		  return -in_unit_sphere;
+  }
+
+  vec3 reflect(const vec3& v, const vec3& n) {
+	  return v - 2 * dot(v, n) * n;
   }
 
   using point3 = vec3; 
