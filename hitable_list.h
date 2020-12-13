@@ -13,7 +13,7 @@ using std::make_shared;
 
 class hitable_list : public hitable {
 public: 
-    hitable_list() {};
+    hitable_list() {}
     hitable_list(shared_ptr<hitable> object) { add(object); }
 
     void clear() { objects.clear(); }
@@ -21,6 +21,7 @@ public:
 
     virtual bool hit(const ray& r, double tmin, double tmax, hit_record& rec) const override;
 
+public:
     std::vector<shared_ptr<hitable>> objects;
 };
 
@@ -28,6 +29,7 @@ bool hitable_list::hit(const ray& r, double tmin, double tmax, hit_record& rec) 
     hit_record temp_rec; 
     bool hit_anything = false;
     auto closest_so_far = tmax; 
+
     for (const auto& object : objects) {
         if (object->hit(r, tmin, closest_so_far, temp_rec)) {
             hit_anything = true; 
@@ -35,6 +37,8 @@ bool hitable_list::hit(const ray& r, double tmin, double tmax, hit_record& rec) 
             rec = temp_rec;
         }
     }
+
     return hit_anything;
 }
+
 #endif // !HITABLELISTH
