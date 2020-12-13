@@ -1,5 +1,5 @@
 #pragma once
-#ifndef SPHEREH 
+/*#ifndef SPHEREH 
 #define SPHEREH
 
 #include "hitable.h"
@@ -18,15 +18,15 @@ public:
 
 bool sphere::hit(const ray& r, double tmin, double tmax, hit_record& rec) const {
     vec3 oc = r.origin() - center; 
-    auto a = r.direction().lenght_squared();
-    auto half_b = dot(oc, r.direction()); 
-    auto c = oc.lenght_squared() - radius * radius; 
+    double a = r.direction().lenght_squared();
+    double half_b = dot(oc, r.direction()); 
+    double c = oc.lenght_squared() - (radius * radius); 
 
-    auto discriminant = half_b * half_b - a * c;
-    if (discriminant < 0) return false; 
-    auto sqrtd = sqrt(discriminant); 
+    double discriminant = (half_b * half_b) - a * c;
+   if (discriminant < 0.0) return false; 
+    double sqrtd = sqrt(discriminant); 
 
-    auto root = (-half_b - sqrtd) / a; 
+    double root = (-half_b - sqrtd) / a; 
     if (root < tmin || tmax < root) {
         root = (-half_b + sqrtd) / a; 
         if (root < tmin || tmax < root)
@@ -39,6 +39,39 @@ bool sphere::hit(const ray& r, double tmin, double tmax, hit_record& rec) const 
     rec.set_face_normal(r, outward_normal);
 
     return true;
-}
+}*/
 
+#ifndef SPHEREH 
+#define SPHEREH
+
+#include "hitable.h"
+
+class sphere : public hitable {
+public:
+    sphere();
+    sphere(vec3 cen, double r) : center(cen), radius(r) {};
+    virtual bool hit(const ray& r, double tmin, double tmax, hit_record& rec) const;
+
+    vec3 center;
+    float radius;
+};
+
+bool sphere::hit(const ray& r, double tmin, double tmax, hit_record& rec) const {
+    vec3 oc = r.origin() - center;
+    double a = dot(r.direction(), r.direction());
+    double b = dot(oc, r.direction());
+    double c = dot(oc, oc) - (radius * radius);
+    double discriminant = (b * b) - (a * c);
+
+    if (discriminant > 0.0) {
+        float temp = (double(-b) - sqrt(discriminant)) / (a);
+        if (temp < tmax && temp > tmin) {
+            rec.t = temp;
+            rec.p = r.at(rec.t);
+            rec.normal = (rec.p - center) / radius;
+            return true;
+        }
+    }
+    return false;
+}
 #endif // !SPHEREH 

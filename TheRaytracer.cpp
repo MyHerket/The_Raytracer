@@ -43,8 +43,8 @@ int main()
     //World
     hitable_list world;
     world.add(make_shared<sphere>(point3(0.0, 0.0, -1.0), 0.5));
-    world.add(make_shared<sphere>(point3(1.0, 1.0, -1.5), 0.5));
-    world.add(make_shared<sphere>(point3(0.0, -100.5, -1.5), 100));
+    world.add(make_shared<sphere>(point3(1.0, 1.0, -1.0), 0.5));
+    world.add(make_shared<sphere>(point3(0.0, -100.5, -1.0), 100));
 
 
     //Setup Camera
