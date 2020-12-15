@@ -142,10 +142,12 @@
     <ClCompile Include="TheRaytracer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Bounding_Volume.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="color.h" />
     <ClInclude Include="hitable.h" />
     <ClInclude Include="material.h" />
+    <ClInclude Include="moving_sphere.h" />
     <ClInclude Include="ray.h" />
     <ClInclude Include="hitable_list.h" />
     <ClInclude Include="rtweekend.h" />

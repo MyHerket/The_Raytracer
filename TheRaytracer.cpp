@@ -12,6 +12,7 @@
 #include "sphere.h"
 #include "Camera.h"
 #include "material.h"
+#include "moving_sphere.h"
 
 hitable_list random_scene() {
     hitable_list world; 
@@ -30,7 +31,8 @@ hitable_list random_scene() {
                     //difuse
                     auto albedo = color::random() * color::random(); 
                     sphere_material = make_shared<lambertian>(albedo); 
-                    world.add(make_shared<sphere>(center, 0.2, sphere_material)); 
+                    auto center2 = center + vec3(0, random_double(0, 0.5), 0);
+                    world.add(make_shared<moving_sphere>(center, center2, 0.0, 1.0, 0.2, sphere_material)); 
                 }
                 else if (choose_mat < 0.95) {
                     //metal
@@ -85,8 +87,8 @@ color ray_color(const ray& r, const hitable& world, int depth) {
 int main()
 {
     //Setup image
-    const auto aspect_ratio = 3.0 / 2.0;
-    const int image_width = 1200; 
+    const auto aspect_ratio = 16.0 / 9.0;
+    const int image_width = 400; 
     const int image_height = static_cast<int>(image_width/aspect_ratio);
     const int samples_per_pixel = 100;
     const int max_depth = 50;
@@ -101,7 +103,7 @@ int main()
     auto disk_to_focus = 10.0; //(lookfrom - lookat).lenght();
     auto aperture = 0.1; 
 
-    camera cam(lookfrom, lookat, vup, 20, aspect_ratio, aperture, disk_to_focus);
+    camera cam(lookfrom, lookat, vup, 20, aspect_ratio, aperture, disk_to_focus, 0.0, 1.0);
   
     //Render
 
