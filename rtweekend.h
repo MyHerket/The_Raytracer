@@ -6,6 +6,7 @@
 #include <limits>
 #include <memory>
 #include <cstdlib>
+#include <cmath>
 
 //Usings
 using std::shared_ptr;
