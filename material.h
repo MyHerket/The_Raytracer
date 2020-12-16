@@ -4,6 +4,7 @@
 
 #include "rtweekend.h"
 #include "hitable_list.h"
+#include "Texture.h"
 
 struct hit_record; 
 class material {
@@ -15,7 +16,8 @@ public:
 //This gives us attenuation albedo/p with probability p.
 class lambertian : public material {
 public: 
-	lambertian(const color& a) : albedo(a) {}
+	lambertian(const color& a) : albedo(make_shared<solid_color>(a)) {}
+	lambertian(shared_ptr<texture> a) : albedo(a) {}
 
 	virtual bool scatter(
 		const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered
@@ -27,12 +29,12 @@ public:
 			scatter_direction = rec.normal;
 
 		scattered = ray(rec.p, scatter_direction, r_in.time()); 
-		attenuation = albedo; 
+		attenuation = albedo->value(rec.u, rec.v, rec.p); 
 		return true;
 	}
 
 public: 
-	color albedo;
+	shared_ptr<texture> albedo;
 };
 
 class metal : public material {

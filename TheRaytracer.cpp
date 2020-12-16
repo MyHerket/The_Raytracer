@@ -16,7 +16,8 @@
 
 hitable_list random_scene() {
     hitable_list world; 
-    auto ground_material = make_shared<lambertian>(color(0.5, 0.5, 0.5)); 
+    auto checker = make_shared<checker_texture>(color(0.2, 0.3, 0.1), color(0.9, 0.9, 0.9));
+    auto ground_material = make_shared<lambertian>(checker); 
     world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, ground_material));
 
     for (int a = -11; a < 11; a++) {
@@ -88,10 +89,10 @@ int main()
 {
     //Setup image
     const auto aspect_ratio = 16.0 / 9.0;
-    const int image_width = 400; 
+    const int image_width = 200; 
     const int image_height = static_cast<int>(image_width/aspect_ratio);
-    const int samples_per_pixel = 100;
-    const int max_depth = 50;
+    const int samples_per_pixel = 50;
+    const int max_depth = 10;
 
     //World
     hitable_list world = random_scene();
