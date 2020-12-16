@@ -98,7 +98,7 @@ hitable_list simple_light() {
     //objects.add(make_shared<yz_rect>(0, 3, 0, 3, -10, difflight));
 
     shared_ptr<hitable> box1 = make_shared<box>(point3(0, 0, 0), point3(3, 3, 3), red);
-    box1 = make_shared<rotate_z>(box1, 15);
+    box1 = make_shared<rotate_x>(box1, 15);
     box1 = make_shared<translate>(box1, vec3(2, 0, -2));
     objects.add(box1);
 
