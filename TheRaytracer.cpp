@@ -95,6 +95,24 @@ hitable_list simple_light() {
     return objects;
 }
 
+hitable_list cornell_box() {
+    hitable_list objects; 
+
+    auto red = make_shared<lambertian>(color(0.65, 0.05, 0.05));
+    auto white = make_shared<lambertian>(color(0.73, 0.73, 0.73));
+    auto green = make_shared<lambertian>(color(0.12, 0.45, 0.15));
+    auto light = make_shared<diffuse_light>(color(15, 15, 15));
+
+    objects.add(make_shared<yz_rect>(0, 555, 0,  555,  555, green));
+    objects.add(make_shared<yz_rect>(0, 555, 0, 555, 0, red));
+    objects.add(make_shared<xz_rect>(213,  343,  227,  332,  554, light));
+    objects.add(make_shared<xz_rect>(0, 555, 0,  555, 0, white));
+    objects.add(make_shared<xz_rect>(0, 555, 0,  555,  555, white));
+    objects.add(make_shared<xy_rect>(0, 555, 0,  555,  555, white));
+
+    return objects;
+}
+
 color ray_color(const ray& r, const color& background, const hitable& world, int depth, bool& back) {
     hit_record rec; 
     if (depth <= 0)
@@ -126,11 +144,11 @@ color ray_color(const ray& r, const color& background, const hitable& world, int
 int main()
 {
     //Setup image
-    const auto aspect_ratio = 16.0 / 9.0;
-    const int image_width = 200; 
-    const int image_height = static_cast<int>(image_width/aspect_ratio);
+    auto aspect_ratio = 16.0 / 9.0;
+    int image_width = 200; 
+    int image_height = static_cast<int>(image_width/aspect_ratio);
     int samples_per_pixel = 50;
-    const int max_depth = 10;
+    const int max_depth = 20;
 
     //World
     hitable_list world;
@@ -168,15 +186,27 @@ int main()
     case 4: 
         background = color(0, 0, 0);
         break;
-    default:
     case 5: 
         world = simple_light(); 
-        //samples_per_pixel = 400; 
+        samples_per_pixel = 400; 
         background = color(0, 0, 0);
         lookfrom = point3(26, 3, 6); 
         lookat = point3(0, 2, 0); 
         vfov = 20.0;
         break;
+    default:
+    case 6: 
+        world = cornell_box(); 
+        aspect_ratio = 1.0; 
+        image_width = 600; 
+        image_height = static_cast<int>(image_width / aspect_ratio);
+        samples_per_pixel = 100; 
+        background = color(0, 0, 0); 
+        lookfrom = point3(278, 278, -800); 
+        lookat = point3(278, 278, 0); 
+        vfov = 40.0;
+        break;
+        
     }
 
 
