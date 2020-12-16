@@ -149,6 +149,7 @@
     <ClInclude Include="hitable.h" />
     <ClInclude Include="material.h" />
     <ClInclude Include="moving_sphere.h" />
+    <ClInclude Include="Perlin.h" />
     <ClInclude Include="ray.h" />
     <ClInclude Include="hitable_list.h" />
     <ClInclude Include="rtweekend.h" />
