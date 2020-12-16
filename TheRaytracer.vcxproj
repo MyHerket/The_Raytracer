@@ -145,6 +145,7 @@
     <ClInclude Include="aarect.h" />
     <ClInclude Include="Bounding_Volume.h" />
     <ClInclude Include="Bounding_Volume_Tree.h" />
+    <ClInclude Include="box.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="color.h" />
     <ClInclude Include="hitable.h" />
