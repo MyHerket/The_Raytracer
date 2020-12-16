@@ -83,7 +83,7 @@ hitable_list two_perlin_spheres() {
 
 }
 
-color ray_color(const ray& r, const hitable& world, int depth) {
+color ray_color(const ray& r, const color& background, const hitable& world, int depth, bool& back) {
     hit_record rec; 
     if (depth <= 0)
         return color(0, 0, 0); 
@@ -91,15 +91,21 @@ color ray_color(const ray& r, const hitable& world, int depth) {
     if (world.hit(r, 0.001, infinity, rec)) {
         ray scattered;
         color attenuation;
+        color emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
+        if (!rec.mat_ptr->scatter(r, rec, attenuation, scattered))
+            return emitted;
         if (rec.mat_ptr->scatter(r, rec, attenuation, scattered))
-            return attenuation * ray_color(scattered, world, depth - 1);
+            return emitted + attenuation * ray_color(scattered, background, world, depth - 1, back);
         return color(0, 0, 0);
     }
     else {
+        //para poner el fondo de un color solido entonces usar
+        //return background;
         // Esto pone el fondo. En este caso es un degradado horizontal.
         vec3 unit_direction = unit_vector(r.direction());
         auto t = 0.5 * (unit_direction.y() + 1.0);
         return (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0);
+        back = true;
         //vec3(0,0,0) = Blanco
         //vec3(0.5, 0.7, 1) = Azul Así que obtenemos un degradado de azul a blanco de arriba a abajo
     }
@@ -109,7 +115,7 @@ int main()
 {
     //Setup image
     const auto aspect_ratio = 16.0 / 9.0;
-    const int image_width = 200; 
+    const int image_width = 400; 
     const int image_height = static_cast<int>(image_width/aspect_ratio);
     const int samples_per_pixel = 50;
     const int max_depth = 10;
@@ -120,12 +126,14 @@ int main()
     point3 lookat;
     double vfov = 40.0;
     auto aperture = 0.0;
+    color background(0, 0, 0);
 
 
     //Set_Scene
     switch (0) {
     case 1: 
         world = random_scene(); 
+        background = color(0.7, 0.8, 1.0);
         lookfrom = point3(13, 2, 3);
         lookat = point3(0, 0, 0);
         vfov = 20.0;
@@ -133,18 +141,24 @@ int main()
         break; 
     case 2:
         world = two_spheres();
+        background = color(0.7, 0.8, 1.0);
         lookfrom = point3(13, 2, 3); 
         lookat = point3(0, 0, 0); 
         vfov = 20.0; 
         break;
-    default: 
+    default:
     case 3: 
         world = two_perlin_spheres();
+        background = color(0.7, 0.8, 1.0);
         lookfrom = point3(13, 2, 3); 
         lookat = point3(0, 0, 0); 
         vfov = 20.0; 
         break;
+    case 4: 
+        background = color(0, 0, 0);
+        break;
     }
+
 
     //Setup Camera
     vec3 vup(0, 1, 0);
@@ -161,18 +175,22 @@ int main()
 
     file << "P3\n" << image_width << " " << image_height << "\n255\n"; 
     
+    bool back = false;
     for (int j = image_height - 1; j >= 0; --j) {
         std::cout << "\rScanlines remaining: " << j << " " << std::flush;
         for (int i = 0; i < image_width; ++i) {
             color pixel_color(0.0, 0.0, 0.0);
-            for (int s = 0; s < samples_per_pixel; ++s) {
+            for (int s = 0; s < samples_per_pixel && back == false; ++s) {
                 auto u = (i + random_double()) / (image_width - 1.0);
                 auto v = (j + random_double()) / (image_height - 1.0);
                 ray r = cam.get_ray(u, v);
                 vec3 p = r.at(2.0);
-                pixel_color += ray_color(r, world, max_depth);
+                pixel_color += ray_color(r, background, world, max_depth, back);
+                if (back == true)
+                    pixel_color = samples_per_pixel * ray_color(r, background, world, max_depth, back);
             }
-            write_color(file, pixel_color, samples_per_pixel);
+            write_color(file, pixel_color, samples_per_pixel, back);
+            back = false;
           
         }
     }
