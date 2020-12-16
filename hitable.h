@@ -92,9 +92,9 @@ rotate_y::rotate_y(shared_ptr<hitable> p, double angle) : ptr(p) {
 	for (int i = 0; i < 2; i++) {
 		for (int j = 0; j < 2; j++) {
 			for (int k = 0; k < 2; k++) {
-				auto x = i * bbox.max().x() + (1 - i) * bbox.min().x();
-				auto y = j * bbox.max().y() + (1 - j) * bbox.min().y();
-				auto z = k * bbox.max().z() + (1 - k) * bbox.min().z();
+				auto x = double(i) * bbox.max().x() + (1.0 - double(i)) * bbox.min().x();
+				auto y = double(j) * bbox.max().y() + (1.0 - double(j)) * bbox.min().y();
+				auto z = double(k) * bbox.max().z() + (1.0 - double(k)) * bbox.min().z();
 
 				auto newx = cos_theta * x + sin_theta * z;
 				auto newz = -sin_theta * x + cos_theta * z; 
@@ -119,7 +119,7 @@ bool rotate_y::hit(const ray& r, double t_min, double t_max, hit_record& rec)con
 	origin[2] = sin_theta * r.origin()[0] + cos_theta * r.origin()[2];
 
 	direction[0] = cos_theta*r.direction()[0] - sin_theta*r.direction()[2];
-	direction[0] = sin_theta*r.direction()[0] + cos_theta*r.direction()[2];
+	direction[2] = sin_theta*r.direction()[0] + cos_theta*r.direction()[2];
 
 	ray rotated_r(origin, direction, r.time()); 
 	if (!ptr->hit(rotated_r, t_min, t_max, rec))
@@ -132,7 +132,7 @@ bool rotate_y::hit(const ray& r, double t_min, double t_max, hit_record& rec)con
 	p[2] = -sin_theta*rec.p[0] + cos_theta*rec.p[2];
 
 	normal[0] = cos_theta*rec.normal[0] + sin_theta*rec.normal[2];
-	normal[1] = -sin_theta*rec.normal[0] + cos_theta*rec.normal[2];
+	normal[2] = -sin_theta*rec.normal[0] + cos_theta*rec.normal[2];
 
 	rec.p = p; 
 	rec.set_face_normal(rotated_r, normal); 

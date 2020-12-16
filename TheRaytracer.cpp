@@ -88,11 +88,20 @@ hitable_list two_perlin_spheres() {
 hitable_list simple_light() {
     hitable_list objects;
     auto pertext = make_shared<noise_texture>(4); 
+    auto red = make_shared<lambertian>(color(0.65, 0.05, 0.05));
     objects.add(make_shared<sphere>(point3(0, -1000, 0), 1000, make_shared<lambertian>(pertext)));
-    objects.add(make_shared<sphere>(point3(0, 2, 0), 2, make_shared<lambertian>(pertext)));
+    //objects.add(make_shared<sphere>(point3(0, 2, 0), 2, make_shared<lambertian>(pertext)));
 
     auto difflight = make_shared<diffuse_light>(color(4, 4, 4));
     objects.add(make_shared<xy_rect>(3, 5, 1, 3, -2, difflight));
+    objects.add(make_shared<xz_rect>(0, 5, 1, 5, 6, difflight)); 
+    //objects.add(make_shared<yz_rect>(0, 3, 0, 3, -10, difflight));
+
+    shared_ptr<hitable> box1 = make_shared<box>(point3(0, 0, 0), point3(3, 3, 3), red);
+    box1 = make_shared<rotate_y>(box1, 15);
+    box1 = make_shared<translate>(box1, vec3(2, 0, -2));
+    objects.add(box1);
+
     return objects;
 }
 
@@ -102,16 +111,17 @@ hitable_list cornell_box() {
     auto red = make_shared<lambertian>(color(0.65, 0.05, 0.05));
     auto white = make_shared<lambertian>(color(0.73, 0.73, 0.73));
     auto green = make_shared<lambertian>(color(0.12, 0.45, 0.15));
-    auto light = make_shared<diffuse_light>(color(15, 15, 15));
+    auto light = make_shared<diffuse_light>(color(7,7,7));
 
-    objects.add(make_shared<yz_rect>(0, 555, 0,  555,  555, green));
-    objects.add(make_shared<yz_rect>(0, 555, 0, 555, 0, red));
-    objects.add(make_shared<xz_rect>(213,  343,  227,  332,  554, light));
-    objects.add(make_shared<xz_rect>(0, 555, 0,  555, 0, white));
-    objects.add(make_shared<xz_rect>(0, 555, 0,  555,  555, white));
-    objects.add(make_shared<xy_rect>(0, 555, 0,  555,  555, white));
+    objects.add(make_shared<xz_rect>(113, 443, 127, 432, 0, light));
 
-    shared_ptr<hitable> box1 = make_shared<box>(point3(0, 0, 0), point3(165, 330, 165), white);
+    //objects.add(make_shared<yz_rect>(0, 555, 0,  555,  555, green));
+    //objects.add(make_shared<yz_rect>(0, 555, 0, 555, 0, red));
+    //objects.add(make_shared<xz_rect>(0, 555, 0,  555, 0, white));
+    //objects.add(make_shared<xz_rect>(0, 555, 0,  555,  555, white));
+    //objects.add(make_shared<xy_rect>(0, 555, 0,  555,  555, white));
+
+    /*shared_ptr<hitable> box1 = make_shared<box>(point3(0, 0, 0), point3(165, 330, 165), white);
     box1 = make_shared<rotate_y>(box1, 15);
     box1 = make_shared<translate>(box1, vec3(265, 0, 295));
     objects.add(box1);
@@ -119,7 +129,7 @@ hitable_list cornell_box() {
     shared_ptr<hitable> box2 = make_shared<box>(point3(0, 0, 0), point3(165, 165, 165), white);
     box2 = make_shared<rotate_y>(box2, -18);
     box2 = make_shared<translate>(box2, vec3(130, 0, 65));
-    objects.add(box2);
+    objects.add(box2);*/
 
     return objects;
 }
@@ -156,10 +166,10 @@ int main()
 {
     //Setup image
     auto aspect_ratio = 16.0 / 9.0;
-    int image_width = 200; 
+    int image_width = 400; 
     int image_height = static_cast<int>(image_width/aspect_ratio);
     int samples_per_pixel = 50;
-    const int max_depth = 20;
+    const int max_depth = 50;
 
     //World
     hitable_list world;
@@ -197,21 +207,21 @@ int main()
     case 4: 
         background = color(0, 0, 0);
         break;
+    default:
     case 5: 
         world = simple_light(); 
-        samples_per_pixel = 400; 
+        samples_per_pixel = 200; 
         background = color(0, 0, 0);
         lookfrom = point3(26, 3, 6); 
         lookat = point3(0, 2, 0); 
         vfov = 20.0;
         break;
-    default:
     case 6: 
         world = cornell_box(); 
         aspect_ratio = 1.0; 
         image_width = 600; 
         image_height = static_cast<int>(image_width / aspect_ratio);
-        samples_per_pixel = 100; 
+        samples_per_pixel = 200; 
         background = color(0, 0, 0); 
         lookfrom = point3(278, 278, -800); 
         lookat = point3(278, 278, 0); 
