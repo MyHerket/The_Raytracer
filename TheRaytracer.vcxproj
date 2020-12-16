@@ -142,6 +142,7 @@
     <ClCompile Include="TheRaytracer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="aarect.h" />
     <ClInclude Include="Bounding_Volume.h" />
     <ClInclude Include="Bounding_Volume_Tree.h" />
     <ClInclude Include="Camera.h" />

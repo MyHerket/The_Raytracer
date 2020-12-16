@@ -13,6 +13,7 @@
 #include "Camera.h"
 #include "material.h"
 #include "moving_sphere.h"
+#include "aarect.h"
 
 hitable_list random_scene() {
     hitable_list world; 
@@ -83,6 +84,17 @@ hitable_list two_perlin_spheres() {
 
 }
 
+hitable_list simple_light() {
+    hitable_list objects;
+    auto pertext = make_shared<noise_texture>(4); 
+    objects.add(make_shared<sphere>(point3(0, -1000, 0), 1000, make_shared<lambertian>(pertext)));
+    objects.add(make_shared<sphere>(point3(0, 2, 0), 2, make_shared<lambertian>(pertext)));
+
+    auto difflight = make_shared<diffuse_light>(color(4, 4, 4));
+    objects.add(make_shared<xy_rect>(3, 5, 1, 3, -2, difflight));
+    return objects;
+}
+
 color ray_color(const ray& r, const color& background, const hitable& world, int depth, bool& back) {
     hit_record rec; 
     if (depth <= 0)
@@ -100,12 +112,12 @@ color ray_color(const ray& r, const color& background, const hitable& world, int
     }
     else {
         //para poner el fondo de un color solido entonces usar
-        //return background;
+        return background;
         // Esto pone el fondo. En este caso es un degradado horizontal.
-        vec3 unit_direction = unit_vector(r.direction());
-        auto t = 0.5 * (unit_direction.y() + 1.0);
-        return (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0);
-        back = true;
+        //vec3 unit_direction = unit_vector(r.direction());
+        //auto t = 0.5 * (unit_direction.y() + 1.0);
+        //return (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0, 0, 0);
+        //back = true;
         //vec3(0,0,0) = Blanco
         //vec3(0.5, 0.7, 1) = Azul Así que obtenemos un degradado de azul a blanco de arriba a abajo
     }
@@ -115,9 +127,9 @@ int main()
 {
     //Setup image
     const auto aspect_ratio = 16.0 / 9.0;
-    const int image_width = 400; 
+    const int image_width = 200; 
     const int image_height = static_cast<int>(image_width/aspect_ratio);
-    const int samples_per_pixel = 50;
+    int samples_per_pixel = 50;
     const int max_depth = 10;
 
     //World
@@ -146,7 +158,6 @@ int main()
         lookat = point3(0, 0, 0); 
         vfov = 20.0; 
         break;
-    default:
     case 3: 
         world = two_perlin_spheres();
         background = color(0.7, 0.8, 1.0);
@@ -156,6 +167,15 @@ int main()
         break;
     case 4: 
         background = color(0, 0, 0);
+        break;
+    default:
+    case 5: 
+        world = simple_light(); 
+        //samples_per_pixel = 400; 
+        background = color(0, 0, 0);
+        lookfrom = point3(26, 3, 6); 
+        lookat = point3(0, 2, 0); 
+        vfov = 20.0;
         break;
     }
 
