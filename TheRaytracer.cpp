@@ -63,6 +63,16 @@ hitable_list random_scene() {
     return world;
 }
 
+hitable_list two_spheres() {
+    hitable_list objects; 
+    auto checker = make_shared<checker_texture>(color(0.2, 0.3, 0.1), color(0.9, 0.9, 0.9));
+
+    objects.add(make_shared<sphere>(point3(0, -10, 0), 10, make_shared<lambertian>(checker)));
+    objects.add(make_shared<sphere>(point3(0, 10, 0), 10, make_shared<lambertian>(checker)));
+
+    return objects;
+}
+
 color ray_color(const ray& r, const hitable& world, int depth) {
     hit_record rec; 
     if (depth <= 0)
@@ -95,15 +105,34 @@ int main()
     const int max_depth = 10;
 
     //World
-    hitable_list world = random_scene();
+    hitable_list world;
+    point3 lookfrom; 
+    point3 lookat;
+    double vfov = 40.0;
+    auto aperture = 0.0;
+
+
+    //Set_Scene
+    switch (0) {
+    case 1: 
+        world = random_scene(); 
+        lookfrom = point3(13, 2, 3);
+        lookat = point3(0, 0, 0);
+        vfov = 20.0;
+        aperture = 0.1;
+        break; 
+    default:
+    case 2:
+        world = two_spheres();
+        lookfrom = point3(13, 2, 3); 
+        lookat = point3(0, 0, 0); 
+        vfov = 20.0; 
+        break;
+    }
 
     //Setup Camera
-    point3 lookfrom(13, 2, 3); 
-    point3 lookat(0, 0, 0); 
-    vec3 vup(0, 1, 0); 
+    vec3 vup(0, 1, 0);
     auto disk_to_focus = 10.0; //(lookfrom - lookat).lenght();
-    auto aperture = 0.1; 
-
     camera cam(lookfrom, lookat, vup, 20, aspect_ratio, aperture, disk_to_focus, 0.0, 1.0);
   
     //Render
