@@ -53,5 +53,8 @@
     <ClInclude Include="Bounding_Volume.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
+    <ClInclude Include="Bounding_Volume_Tree.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
