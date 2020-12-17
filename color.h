@@ -23,7 +23,7 @@ void write_color(std::ostream& out, color pixel_color, int samples_per_pixel) {
 		<< static_cast<int>(256*clamp(b, 0.0, 0.999)) << "\n";
 }
 
-void write_color(std::ofstream& out, color pixel_color, int samples_per_pixel, bool back) {
+void write_color(std::ofstream& out, color pixel_color, int samples_per_pixel) {
 	auto r = pixel_color.x();
 	auto g = pixel_color.y();
 	auto b = pixel_color.z(); 
@@ -33,14 +33,11 @@ void write_color(std::ofstream& out, color pixel_color, int samples_per_pixel, b
 	r = sqrt(scale*r);
 	g = sqrt(scale*g);
 	b = sqrt(scale*b);
-	if(back == false)
 		//Write the translated [0,255] value of each color component
-		out << static_cast<int>(256 * clamp(r, 0.0, 0.999)) << " "
-		<< static_cast<int>(256 * clamp(g, 0.0, 0.999)) << " "
-		<< static_cast<int>(256 * clamp(b, 0.0, 0.999)) << "\n";
-	else
-		out << static_cast<int>(255.999 * pixel_color.x()) << ' '
-		<< static_cast<int>(255.999 * pixel_color.y()) << ' '
-		<< static_cast<int>(255.999 * pixel_color.z()) << '\n';
+	out << static_cast<int>(256 * clamp(r, 0.0, 0.999)) << " "
+	<< static_cast<int>(256 * clamp(g, 0.0, 0.999)) << " "
+	<< static_cast<int>(256 * clamp(b, 0.0, 0.999)) << "\n";
 }
+
+
 #endif // !COLOR_H
