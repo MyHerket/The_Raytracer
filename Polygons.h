@@ -5,6 +5,9 @@
 #include "rtweekend.h"
 #include "hitable_list.h"
 
+
+#include <vector>
+
 class triangle : public hitable {
 public:
 	triangle() {}
@@ -62,6 +65,35 @@ bool triangle::hit(const ray& r, double t_min, double t_max, hit_record& rec) co
 	rec.mat_ptr = mp;
 	rec.p = r.at(t);
 	return true;
+}
+
+//Polygon es un caso particular de una malla
+
+class polygon : public hitable {
+public:
+	polygon() {}
+	polygon(const std::vector<point3>& positions, std::vector<int> vertex, shared_ptr<material> ptr);
+
+	virtual bool hit(const ray& r, double t_min, double t_max, hit_record& rec) const override;
+
+	virtual bool bounding_box(double time0, double time1, aabb& output_box) const override {
+		return sides.bounding_box(time0, time1, output_box);
+	}
+
+public:
+	std::vector<int> vertices;
+	hitable_list sides;
+};
+
+polygon::polygon(const std::vector<point3>& positions, std::vector<int> v, shared_ptr<material> ptr) {
+	vertices = v;
+	for (std::size_t i = 1; i < v.size()-1; ++i) {
+		sides.add(make_shared<triangle>(positions[v[0]], positions[v[i]], positions[v[i + 1]], ptr));
+	}
+}
+
+bool polygon::hit(const ray& r, double t_min, double t_max, hit_record& rec)const {
+	return sides.hit(r, t_min, t_max, rec);
 }
 
 #endif // !POLYGON_H

@@ -53,7 +53,7 @@ int main()
 {
     //Setup image
     auto aspect_ratio = 16.0 / 9.0;
-    int image_width = 600; 
+    int image_width = 400; 
     int image_height = static_cast<int>(image_width/aspect_ratio);
     int samples_per_pixel = 50;
     const int max_depth = 50;
