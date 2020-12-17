@@ -18,7 +18,21 @@ public:
 		//dimension a small amount
 		point3 min(fmin(fmin(v1.x(), v2.x()), v3.x()), fmin(fmin(v1.y(), v2.y()), v3.y()), fmin(fmin(v1.z(), v2.z()), v3.z()));
 		point3 max(fmax(fmax(v1.x(), v2.x()), v3.x()), fmax(fmax(v1.y(), v2.y()), v3.y()), fmax(fmax(v1.z(), v2.z()), v3.z()));
-		
+
+		auto outward_normal = unit_vector(cross((v2 - v1), (v3 - v1)));
+		if (outward_normal == vec3(1, 0, 0)){
+			min += vec3(-0.0001, 0, 0);
+			max += vec3(0.0001, 0, 0);
+		}
+		else if (outward_normal == vec3(0, 1, 0)) {
+			min += vec3(0, -0.0001, 0);
+			max += vec3(0, 0.0001, 0);
+		}
+		else if (outward_normal == vec3(0, 0, 1)) {
+			min += vec3(0, 0, -0.0001);
+			max += vec3(0, 0, 0.0001);
+		}
+
 		output_box = aabb(min, max);
 		return true;
 	}
@@ -30,17 +44,20 @@ public:
 };
 
 bool triangle::hit(const ray& r, double t_min, double t_max, hit_record& rec) const {
-	auto t = (k - r.origin().z()) / r.direction().z();
+	auto outward_normal = unit_vector(cross((v2-v1), (v3-v1)));
+	auto dist = -dot(outward_normal, v1);
+	auto t = -(dot(outward_normal, r.origin()) + dist) / (dot(outward_normal, r.direction()));
 	if (t<t_min || t>t_max)
 		return false;
-	auto x = r.origin().x() + t * r.direction().x();
-	auto y = r.origin().y() + t * r.direction().y();
-	if (x<x0 || x>x1 || y<y0 || y>y1)
+
+	auto p = t * r.direction() + r.origin();
+	auto s1 = dot(outward_normal, cross(v2 - v1, p - v1));
+	auto s2 = dot(outward_normal, cross(v3 - v2, p - v2));
+	auto s3 = dot(outward_normal, cross(v1 - v3, p - v3));
+
+	if (s1 * s2 < 0 || s1 * s3 < 0 || s2 * s3 < 0)
 		return false;
-	rec.u = (x - x0) / (x1 - x0);
-	rec.v = (y - y0) / (y1 - y0);
-	rec.t = t;
-	auto outward_normal = vec3(0, 0, 1);
+
 	rec.set_face_normal(r, outward_normal);
 	rec.mat_ptr = mp;
 	rec.p = r.at(t);

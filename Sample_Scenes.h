@@ -15,6 +15,7 @@
 #include "moving_sphere.h"
 #include "aarect.h"
 #include "box.h"
+#include "Polygons.h"
 
 hitable_list random_scene() {
     hitable_list world;
@@ -119,6 +120,7 @@ hitable_list just_a_sphere() {
     hitable_list objects;
     auto pertext = make_shared<noise_texture>(6);
     auto red = make_shared<lambertian>(color(0.65, 0.05, 0.05));
+    auto pink = make_shared<lambertian>(color(0.9, 128/255, 192/255));
     auto metal_blue = make_shared<metal>(color(0.05, 0.05, 0.7), 0.4);
     objects.add(make_shared<sphere>(point3(0, -1000, 0), 1000, make_shared<lambertian>(pertext)));
 
@@ -127,6 +129,11 @@ hitable_list just_a_sphere() {
     
     objects.add(make_shared<sphere>(point3(10, 1, 0), 0.45, metal_blue));
     objects.add(make_shared<sphere>(point3(10, 1, 0), 0.5, make_shared<dielectric>(1.5)));
+    shared_ptr<hitable> tri = make_shared<triangle>(point3(10, 1, 5), point3(8, 2,1), point3(2, 3, 0), pink);
+    tri = make_shared<translate>(tri, vec3(0, 0, 20)); 
+    tri = make_shared<rotate_y>(tri, -15);
+    objects.add(tri);
+
 
     return objects;
 }
