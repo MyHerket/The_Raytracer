@@ -7,6 +7,7 @@
 #include <memory>
 #include <cstdlib>
 #include <cmath>
+#include <vector>
 
 //Usings
 using std::shared_ptr;

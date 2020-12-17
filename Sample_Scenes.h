@@ -8,7 +8,6 @@
 #include <cfloat>
 
 #include "rtweekend.h"
-
 #include "hitable_list.h"
 #include "sphere.h"
 #include "material.h"
@@ -125,14 +124,19 @@ hitable_list just_a_sphere() {
     objects.add(make_shared<sphere>(point3(0, -1000, 0), 1000, make_shared<lambertian>(pertext)));
 
     auto difflight = make_shared<diffuse_light>(color(4, 4, 4));
-    objects.add(make_shared<xy_rect>(3, 5, 1, 3, -4, difflight));
+    objects.add(make_shared<xy_rect>(3, 5, 1, 3, -6, difflight));
     objects.add(make_shared<xz_rect>(0, 5, 1, 5, 6, difflight));
     
-    objects.add(make_shared<sphere>(point3(10, 1, 0), 0.45, metal_blue));
-    objects.add(make_shared<sphere>(point3(10, 1, 0), 0.5, make_shared<dielectric>(1.5)));
-    shared_ptr<hitable> tri = make_shared<triangle>(point3(10, 1, -3), point3(8, 5, -3), point3(3, 1, 0), pink);
-    objects.add(tri);
+    std::vector<point3> positions; 
+    positions.push_back(vec3(3, 0, 3));
+    positions.push_back(vec3(3, 0, -3));
+    positions.push_back(vec3(3, 3, -5));
+    positions.push_back(vec3(3, 5, 0));
+    positions.push_back(vec3(3, 3, 5));
 
+    std::vector<int> vertices{0,1, 2, 3, 4};
+
+    objects.add(make_shared<polygon>(positions, vertices, red));
 
     return objects;
 }

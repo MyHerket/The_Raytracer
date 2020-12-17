@@ -5,9 +5,6 @@
 #include "rtweekend.h"
 #include "hitable_list.h"
 
-
-#include <vector>
-
 class triangle : public hitable {
 public:
 	triangle() {}
