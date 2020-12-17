@@ -133,10 +133,15 @@ hitable_list just_a_sphere() {
     positions.push_back(vec3(3, 3, -5));
     positions.push_back(vec3(3, 5, 0));
     positions.push_back(vec3(3, 3, 5));
+    positions.push_back(vec3(4, 6, 2));
 
-    std::vector<int> vertices{0,1, 2, 3, 4};
+    std::vector<std::vector<int>> index_v;
+    index_v.push_back(std::vector<int>{0,1, 2, 3, 4});
+    index_v.push_back(std::vector<int>{3, 4, 5});
 
-    objects.add(make_shared<polygon>(positions, vertices, red));
+
+    //objects.add(make_shared<polygon>(positions, vertices, red));
+    objects.add(make_shared<mesh>(positions, index_v, red));
 
     return objects;
 }

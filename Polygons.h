@@ -108,7 +108,7 @@ public:
 };
 
 mesh::mesh(const std::vector<point3>& positions, const std::vector<std::vector<int>>& i_v, shared_ptr<material> ptr) {
-	for (std::size_t i = 0; i < i_v.size(); ++i) {
+	for (std::size_t i = 0; i < i_v.size(); i++) {
 		sides.add(make_shared<polygon>(positions, i_v[i], ptr));
 	}
 }
