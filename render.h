@@ -66,9 +66,10 @@ class gr {
 public: 
 	hitable_list world; 
 	ifstream in_file;
+	shared_ptr<material> def;
 
 	gr() {}
-	gr(const char* name, shared_ptr<material> mtp) {
+	gr(const char* name, const shared_ptr<material> mtp) {
 		//Este archivo leerá los archivos lua y los interpretará para construir la escena.
 		string line;
 		in_file.open(name); 
@@ -79,33 +80,37 @@ public:
 		while (getline (in_file, line)) {
 			cout << line << endl;
 		}
+		def = mtp;
 	}
 
-	void nh_box(const char* name, const point3& corner, const double r, const shared_ptr<material> mat = make_shared<metal>(color(0.05, 0.05, 0.7), 1.5)) {
+
+	void nh_box(const char* name, const point3& corner, const double r, const shared_ptr<material> mat) {
 		world.add(make_shared<box>(corner, corner + r, mat, name));
 	}
 
-	void nh_sphere(const char* name, const point3& center, const double r, const shared_ptr<material> mat = make_shared<metal>(color(0.05, 0.05, 0.7), 1.5)) {
+	void nh_sphere(const char* name, const point3& center, const double r, const shared_ptr<material> mat) {
 		world.add(make_shared<sphere>(center, r, mat, name));
 	}
 
-	void cube(const char* name, const shared_ptr<material> mat = make_shared<metal>(color(0.05, 0.05, 0.7), 1.5)) {
+	void cube(const char* name, const shared_ptr<material> mat) {
 		world.add(make_shared<box>( point3(0, 0, 0), point3(1, 1, 1), mat, name));
 	}
 
-	void mesh(const char* name, const vector<point3>& positions, const vector<vector<int>>& i_v, const shared_ptr<material> mat = make_shared<metal>(color(0.05, 0.05, 0.7), 1.5)) {
-		world.add(make_shared<malla>(positions, i_v, mat, name));
+	void mesh(const char* name, const vector<point3>& positions, const vector<vector<int>>& i_v, const shared_ptr<material> mat) {
+		auto M = make_shared<malla>(positions, i_v, mat, name);
+		world.add(M);
 	}
 
 	void light(const char* name, const point3& position, const color& intensity, const vec3& attenuation){
-		world.add(make_shared<spotlight>(position, intensity, attenuation, name));
+		auto lamp = make_shared<spotlight>(position, intensity, attenuation, name);
+		world.add(lamp);
 	}
 
 	void render(
 		const char* node, const char* filename, int w, int h, const point3& eye, const point3& view,
 		const point3& up, double fov, const color& ambient, vector<shared_ptr<hitable>> lights) {
 		
-		//Other Parameters
+		//Other Parameters	
 		int samples_per_pixel = 100;
 		const int max_depth = 50;
 		auto aspect_ratio = w / h;

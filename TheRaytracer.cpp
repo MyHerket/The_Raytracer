@@ -112,8 +112,10 @@ int main()
 
     gr Sample_Scene;
     std::vector<shared_ptr<hitable>> Lights; 
-    Sample_Scene.cube("Cubo");
-    Sample_Scene.nh_sphere("Piso", point3(0, -1000, 0), 1000.0);
+    auto pink = make_shared<lambertian>(color(0.9, 128 / 255, 192 / 255));
+    auto metal_blue = make_shared<metal>(color(0.05, 0.05, 0.7), 0.5);
+    Sample_Scene.cube("Cubo", pink);
+    Sample_Scene.nh_sphere("Piso", point3(0, -1000, 0), 1000.0, metal_blue);
     Lights.push_back(make_shared<spotlight>(point3(0, 1, 5), color(4, 4, 4),     vec3(1,0,0), "Lamp1"));
     Lights.push_back(make_shared<spotlight>(point3(0, 1, -5), color(5, 5, 5),    vec3(1,0,0), "Lamp2"));
     Lights.push_back(make_shared<spotlight>(point3(10, 1, 0), color(10, 10, 10), vec3(1,0,0), "Lamp3"));

@@ -109,7 +109,6 @@ public:
 	}
 
 	virtual color emitted(double u, double v, const point3& p) const override {
-
 		return emit->value(u, v, p);
 	}
 
@@ -134,7 +133,7 @@ public:
 		else 
 			constant = 1 / (c[0] + (c[1] * r) + (c[2] * r * r));
 
-		return emit->value(u*constant, v*constant, p);
+		return constant * emit->value(u, v, p);
 	}
 
 	shared_ptr<texture> emit;

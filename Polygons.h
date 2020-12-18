@@ -94,7 +94,7 @@ bool polygon::hit(const ray& r, double t_min, double t_max, hit_record& rec)cons
 	return sides.hit(r, t_min, t_max, rec);
 }
 
-//POlygonal mesh
+//Malla poligonal
 class malla : public hitable {
 public:
 	malla() {}
