@@ -4,11 +4,12 @@
 
 #include "hitable.h"
 #include "vec3.h"
+#include "material.h"
 
 class sphere : public hitable {
 public:
     sphere() {}
-    sphere(const char* _name, point3 cen, double r, shared_ptr<material> m) : name(_name), center(cen), radius(r), mat_ptr(m) {};
+    sphere(const char* _name,const point3& cen, double r, shared_ptr<material> m) : name(_name), center(cen), radius(r), mat_ptr(m) {};
     virtual bool hit(const ray& r, double tmin, double tmax, hit_record& rec) const override;
     virtual bool bounding_box(double time0, double time1, aabb& output_box) const override;
 
@@ -72,7 +73,7 @@ bool sphere::bounding_box(double time0, double time1, aabb& output_box) const  {
 class light : public hitable {
 public:
     light() {}
-    light(const char* _name, point3 cen, color intensity) : name(_name), center(cen), mat_ptr(make_shared<diffuse_light>(intensity)) {};
+    light(const char* _name, const point3& cen, const color& intensity) : name(_name), center(cen), mat_ptr(make_shared<diffuse_light>(intensity)) {};
     virtual bool hit(const ray& r, double tmin, double tmax, hit_record& rec) const override;
     virtual bool bounding_box(double time0, double time1, aabb& output_box) const override;
 

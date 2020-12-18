@@ -53,7 +53,7 @@ color ray_color(const ray& r, const color& ambient, const hitable& world, int de
 int main()
 {
     //Setup image
-    auto aspect_ratio = 16.0 / 9.0;
+    /*auto aspect_ratio = 16.0 / 9.0;
     int image_width = 600; 
     int image_height = static_cast<int>(image_width/aspect_ratio);
     int samples_per_pixel = 50;
@@ -69,7 +69,7 @@ int main()
 
 
     //Set_Scene
-    /*switch (0) {
+    switch (0) {
     case 1: 
         world = random_scene(); 
         ambient = color(0.7, 0.8, 1.0);
@@ -149,5 +149,14 @@ int main()
     }
 
     std::cout << "\nDone\n";*/
+
+    gr Sample_Scene;
+    std::vector<shared_ptr<hitable>> Lights; 
+
+    Lights.push_back(make_shared<light>("Lamp1", point3(0, 0, 0), color(0.4, 0.4, 0.4))); 
+    Lights.push_back(make_shared<light>("Lamp2", point3(0, 1, 0), color(0.2, 0.2, 0.2)));
+    Lights.push_back(make_shared<light>("Lamp3", point3(1, 0, 0), color(0.1, 0.1, 0.1)));
+
+    Sample_Scene.render("Something", "image2.ppm", 200, 100, point3(26, 3, 6), point3(0, 2, 0), vec3(0, 1, 0), 20.0, color(0.1, 0.1, 0.1), Lights);
 }
 
