@@ -9,6 +9,7 @@
 #include "Camera.h"
 #include "color.h"
 #include "Sample_Scenes.h"
+#include "render.h"
 
 color background(const ray& r) {
     vec3 unit_direction = unit_vector(r.direction());
@@ -68,7 +69,7 @@ int main()
 
 
     //Set_Scene
-    switch (0) {
+    /*switch (0) {
     case 1: 
         world = random_scene(); 
         ambient = color(0.7, 0.8, 1.0);
@@ -147,6 +148,6 @@ int main()
         }
     }
 
-    std::cout << "\nDone\n";
+    std::cout << "\nDone\n";*/
 }
 

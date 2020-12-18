@@ -155,6 +155,7 @@
     <ClInclude Include="Polygons.h" />
     <ClInclude Include="ray.h" />
     <ClInclude Include="hitable_list.h" />
+    <ClInclude Include="render.h" />
     <ClInclude Include="rtweekend.h" />
     <ClInclude Include="Sample_Scenes.h" />
     <ClInclude Include="sphere.h" />

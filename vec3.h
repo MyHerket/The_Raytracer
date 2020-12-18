@@ -93,6 +93,10 @@ public:
 	return vec3(v1.e[0] + v2.e[0], v1.e[1] + v2.e[1], v1.e[2] + v2.e[2]);
 }
 
+  inline vec3 operator+(const vec3& v1, const double r) {
+	  return vec3(v1.e[0] + r, v1.e[1] + r, v1.e[2] + r);
+  }
+
   inline vec3 operator-(const vec3& v1, const vec3& v2) {
 	return vec3(v1.e[0] - v2.e[0], v1.e[1] - v2.e[1], v1.e[2] - v2.e[2]);
 }

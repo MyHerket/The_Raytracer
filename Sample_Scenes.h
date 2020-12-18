@@ -120,7 +120,7 @@ hitable_list just_a_sphere() {
     auto pertext = make_shared<noise_texture>(6);
     auto red = make_shared<lambertian>(color(0.65, 0.05, 0.05));
     auto pink = make_shared<lambertian>(color(0.9, 128/255, 192/255));
-    auto metal_blue = make_shared<metal>(color(0.05, 0.05, 0.7), 0.4);
+    auto metal_blue = make_shared<metal>(color(0.05, 0.05, 0.7), 0.5);
     objects.add(make_shared<sphere>(point3(0, -1000, 0), 1000, make_shared<lambertian>(pertext)));
 
     auto difflight = make_shared<diffuse_light>(color(4, 4, 4));
@@ -141,7 +141,7 @@ hitable_list just_a_sphere() {
 
 
     //objects.add(make_shared<polygon>(positions, vertices, red));
-    objects.add(make_shared<mesh>(positions, index_v, red));
+    objects.add(make_shared<mesh>(positions, index_v, metal_blue));
 
     return objects;
 }
