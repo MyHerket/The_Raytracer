@@ -8,7 +8,7 @@
 class triangle : public hitable {
 public:
 	triangle() {}
-	triangle(const char* _name, const point3& vertex_1, const point3& vertex_2, const point3& vertex_3, shared_ptr<material> mat) :
+	triangle(const point3& vertex_1, const point3& vertex_2, const point3& vertex_3, shared_ptr<material> mat, const char* _name = "Example") :
 		name(_name), v1(vertex_1), v2(vertex_2), v3(vertex_3), mp(mat) {};
 
 	virtual bool hit(const ray& r, double t_min, double t_max, hit_record& rec)const override;
@@ -70,7 +70,7 @@ bool triangle::hit(const ray& r, double t_min, double t_max, hit_record& rec) co
 class polygon : public hitable {
 public:
 	polygon() {}
-	polygon(const char* _name, const std::vector<point3>& positions, const std::vector<int>& v, shared_ptr<material> ptr);
+	polygon(const std::vector<point3>& positions, const std::vector<int>& v, shared_ptr<material> ptr, const char* _name = "Example");
 
 	virtual bool hit(const ray& r, double t_min, double t_max, hit_record& rec) const override;
 
@@ -83,11 +83,11 @@ public:
 	hitable_list sides;
 };
 
-polygon::polygon(const char* _name, const std::vector<point3>& positions, const std::vector<int>& v, shared_ptr<material> ptr) {
-	for (std::size_t i = 1; i < v.size()-1; ++i) {
-		sides.add(make_shared<triangle>(_name, positions[v[0]], positions[v[i]], positions[v[i + 1]], ptr));
-	}
+polygon::polygon(const std::vector<point3>& positions, const std::vector<int>& v, shared_ptr<material> ptr, const char* _name) {
 	name = _name;
+	for (std::size_t i = 1; i < v.size()-1; ++i) {
+		sides.add(make_shared<triangle>(positions[v[0]], positions[v[i]], positions[v[i + 1]], ptr, _name));
+	}
 }
 
 bool polygon::hit(const ray& r, double t_min, double t_max, hit_record& rec)const {
@@ -95,10 +95,10 @@ bool polygon::hit(const ray& r, double t_min, double t_max, hit_record& rec)cons
 }
 
 //POlygonal mesh
-class mesh : public hitable {
+class malla : public hitable {
 public:
-	mesh() {}
-	mesh(const char* _name, const std::vector<point3>& positions, const std::vector<std::vector<int>>& i_v, shared_ptr<material> ptr);
+	malla() {}
+	malla(const std::vector<point3>& positions, const std::vector<std::vector<int>>& i_v, shared_ptr<material> ptr, const char* _name = "Example");
 
 	virtual bool hit(const ray& r, double t_min, double t_max, hit_record& rec) const override;
 
@@ -111,14 +111,14 @@ public:
 	hitable_list sides;
 };
 
-mesh::mesh(const char* _name, const std::vector<point3>& positions, const std::vector<std::vector<int>>& i_v, shared_ptr<material> ptr) {
+malla::malla(const std::vector<point3>& positions, const std::vector<std::vector<int>>& i_v, shared_ptr<material> ptr, const char* _name) {
 	for (std::size_t i = 0; i < i_v.size(); i++) {
-		sides.add(make_shared<polygon>(_name, positions, i_v[i], ptr));
+		sides.add(make_shared<polygon>(positions, i_v[i], ptr, _name));
 	}
 	name = _name;
 }
 
-bool mesh::hit(const ray& r, double t_min, double t_max, hit_record& rec)const {
+bool malla::hit(const ray& r, double t_min, double t_max, hit_record& rec)const {
 	return sides.hit(r, t_min, t_max, rec);
 }
 

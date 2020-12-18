@@ -22,11 +22,50 @@
 
 using namespace std;
 
+
+color background(const ray& r) {
+	vec3 unit_direction = unit_vector(r.direction());
+	auto t = 0.5 * (unit_direction.z() + 1.0);
+	color back3(0.0, 0.0, 1.0);
+	color back1(0.0, 0.0, 0.0);
+	color back2(0.0, 1.0, 0.0);
+
+	if (t <= 0.5) {
+		return (1.0 - 2 * t) * back1 + 2 * t * back2;
+	}
+	else {
+		t = t - 0.5;
+		return (1.0 - 2 * t) * back2 + 2 * t * back3;
+	}
+
+}
+
+color ray_color(const ray& r, const color& ambient, const hitable& world, int depth, int first_depth) {
+	hit_record rec;
+	if (depth <= 0)
+		return ambient;
+
+	if (world.hit(r, 0.001, infinity, rec)) {
+		ray scattered;
+		color attenuation;
+		color emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
+		if (!rec.mat_ptr->scatter(r, rec, attenuation, scattered))
+			return emitted;
+		if (rec.mat_ptr->scatter(r, rec, attenuation, scattered))
+			return emitted + attenuation * ray_color(scattered, ambient, world, depth - 1, first_depth);
+		return color(0, 0, 0);
+	}
+	else if (depth == first_depth)
+		return background(r);
+	else {
+		return ambient;
+	}
+}
+
 class gr {
 public: 
 	hitable_list world; 
 	ifstream in_file;
-	shared_ptr<material> mat = make_shared<metal>(color(0.05, 0.05, 0.7), 0.4);
 
 	gr() {}
 	gr(const char* name, shared_ptr<material> mtp) {
@@ -40,28 +79,26 @@ public:
 		while (getline (in_file, line)) {
 			cout << line << endl;
 		}
-
-		mat = mtp;
 	}
 
-	void nh_box(const char* name, const point3& corner, const double r) {
-		world.add(make_shared<box>(name, corner, corner + r, mat));
+	void nh_box(const char* name, const point3& corner, const double r, const shared_ptr<material> mat = make_shared<metal>(color(0.05, 0.05, 0.7), 1.5)) {
+		world.add(make_shared<box>(corner, corner + r, mat, name));
 	}
 
-	void nh_sphere(const char* name, const point3& center, const double r) {
-		world.add(make_shared<sphere>(name, center, r, mat));
+	void nh_sphere(const char* name, const point3& center, const double r, const shared_ptr<material> mat = make_shared<metal>(color(0.05, 0.05, 0.7), 1.5)) {
+		world.add(make_shared<sphere>(center, r, mat, name));
 	}
 
-	void cube(const char* name) {
-		world.add(make_shared<box>(name, point3(0, 0, 0), point3(1, 1, 1), mat));
+	void cube(const char* name, const shared_ptr<material> mat = make_shared<metal>(color(0.05, 0.05, 0.7), 1.5)) {
+		world.add(make_shared<box>( point3(0, 0, 0), point3(1, 1, 1), mat, name));
 	}
 
-	void mesh(const char* name, const vector<point3>& positions, const vector<vector<int>>& i_v) {
-		world.add(make_shared<mesh>(name, positions, i_v, mat)); 
+	void mesh(const char* name, const vector<point3>& positions, const vector<vector<int>>& i_v, const shared_ptr<material> mat = make_shared<metal>(color(0.05, 0.05, 0.7), 1.5)) {
+		world.add(make_shared<malla>(positions, i_v, mat, name));
 	}
 
-	void light(const char* name, const point3& position, const color& intensity, const vec3& attenuation) {
-		world.add(make_shared<light>(name, position, intensity));
+	void light(const char* name, const point3& position, const color& intensity, const vec3& attenuation){
+		world.add(make_shared<spotlight>(position, intensity, attenuation, name));
 	}
 
 	void render(
@@ -69,18 +106,18 @@ public:
 		const point3& up, double fov, const color& ambient, vector<shared_ptr<hitable>> lights) {
 		
 		//Other Parameters
-		int samples_per_pixel = 50;
+		int samples_per_pixel = 100;
 		const int max_depth = 50;
 		auto aspect_ratio = w / h;
-		auto aperture = 0.0;
+		auto aperture = 0.1;
 
 		//Setup Camera
-		auto disk_to_focus = (eye - view).lenght();
-		camera cam(eye,view, up, fov, aspect_ratio, aperture, disk_to_focus, 0.0, 0.0);
+		auto disk_to_focus = 10.0;
+		camera cam(eye,view, up, fov, aspect_ratio, aperture, disk_to_focus, 0.0, 1.0);
 
 		//Adding lights
-		for (const auto& spotlight : lights) {
-			world.add(spotlight);
+		for (const auto& lamps: lights) {
+			world.add(lamps);
 		}
 
 		//Render

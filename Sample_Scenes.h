@@ -141,7 +141,7 @@ hitable_list just_a_sphere() {
 
 
     //objects.add(make_shared<polygon>(positions, vertices, red));
-    objects.add(make_shared<mesh>(positions, index_v, metal_blue));
+    objects.add(make_shared<malla>(positions, index_v, metal_blue));
 
     return objects;
 }

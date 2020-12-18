@@ -109,9 +109,36 @@ public:
 	}
 
 	virtual color emitted(double u, double v, const point3& p) const override {
+
 		return emit->value(u, v, p);
 	}
 
 	shared_ptr<texture> emit;
+};
+
+class diffuse_light_s : public material {
+public:
+	diffuse_light_s(shared_ptr<texture> a) : emit(a) {}
+	diffuse_light_s(color c, vec3 attenuation, double radius) : emit(make_shared<solid_color>(c)), c(attenuation), r(radius) {}
+
+	virtual bool scatter(
+		const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered
+	) const override {
+		return false;
+	}
+
+	virtual color emitted(double u, double v, const point3& p) const override {
+		double constant;
+		if (c.lenght() == 0) 
+			constant = 0;
+		else 
+			constant = 1 / (c[0] + (c[1] * r) + (c[2] * r * r));
+
+		return emit->value(u*constant, v*constant, p);
+	}
+
+	shared_ptr<texture> emit;
+	vec3 c; 
+	double r;
 };
 #endif // !MATERIALH

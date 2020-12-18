@@ -8,7 +8,7 @@
 class xy_rect : public hitable {
 public:
 	xy_rect() {}
-	xy_rect(const char* _name, double _x0, double _x1, double _y0, double _y1, double _k, shared_ptr<material> mat) :
+	xy_rect(double _x0, double _x1, double _y0, double _y1, double _k, shared_ptr<material> mat, const char* _name = "Example") :
 		name(_name), x0(_x0), x1(_x1), y0(_y0), y1(_y1), k(_k), mp(mat) {};
 
 	virtual bool hit(const ray& r, double t_min, double t_max, hit_record& rec)const override;
@@ -46,8 +46,8 @@ bool xy_rect::hit(const ray& r, double t_min, double t_max, hit_record& rec) con
 class yz_rect : public hitable {
 public:
 	yz_rect() {}
-	yz_rect(double _y0, double _y1, double _z0, double _z1, double _k, shared_ptr<material> mat) :
-		y0(_y0), y1(_y1), z0(_z0), z1(_z1), k(_k), mp(mat) {};
+	yz_rect(double _y0, double _y1, double _z0, double _z1, double _k, shared_ptr<material> mat, const char* _name = "Example") :
+		y0(_y0), y1(_y1), z0(_z0), z1(_z1), k(_k), mp(mat), name(_name) {};
 
 	virtual bool hit(const ray& r, double t_min, double t_max, hit_record& rec)const override;
 
@@ -60,6 +60,7 @@ public:
 
 	shared_ptr<material> mp;
 	double y0, y1, z0, z1, k;
+	const char* name;
 };
 
 bool yz_rect::hit(const ray& r, double t_min, double t_max, hit_record& rec) const {
@@ -83,8 +84,8 @@ bool yz_rect::hit(const ray& r, double t_min, double t_max, hit_record& rec) con
 class xz_rect : public hitable {
 public:
 	xz_rect() {}
-	xz_rect(double _x0, double _x1, double _z0, double _z1, double _k, shared_ptr<material> mat) :
-		x0(_x0), x1(_x1), z0(_z0), z1(_z1), k(_k), mp(mat) {};
+	xz_rect(double _x0, double _x1, double _z0, double _z1, double _k, shared_ptr<material> mat, const char* _name = "Example") :
+		x0(_x0), x1(_x1), z0(_z0), z1(_z1), k(_k), mp(mat), name(_name) {};
 
 	virtual bool hit(const ray& r, double t_min, double t_max, hit_record& rec)const override;
 
@@ -97,6 +98,7 @@ public:
 
 	shared_ptr<material> mp;
 	double x0, x1, z0, z1, k;
+	const char* name;
 };
 
 bool xz_rect::hit(const ray& r, double t_min, double t_max, hit_record& rec) const {

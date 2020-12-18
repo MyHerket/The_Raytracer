@@ -10,46 +10,6 @@
 #include "color.h"
 #include "Sample_Scenes.h"
 #include "render.h"
-
-color background(const ray& r) {
-    vec3 unit_direction = unit_vector(r.direction());
-    auto t = 0.5 * (unit_direction.z() + 1.0);
-    color back3(0.0, 0.0, 1.0);
-    color back1(1.0, 1.0, 1.0); 
-    color back2(0.0, 1.0, 0.0); 
-
-    if (t <= 0.5) {
-        return (1.0 - 2 * t) * back1 + 2 * t * back2;
-    }
-    else {
-        t = t - 0.5;
-        return (1.0 - 2*t) * back2 + 2*t*back3;
-    }
-        
-}
-
-color ray_color(const ray& r, const color& ambient, const hitable& world, int depth, int first_depth) {
-    hit_record rec;
-    if (depth <= 0)
-        return ambient;
-
-    if (world.hit(r, 0.001, infinity, rec)) {
-        ray scattered;
-        color attenuation;
-        color emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
-        if (!rec.mat_ptr->scatter(r, rec, attenuation, scattered))
-            return emitted;
-        if (rec.mat_ptr->scatter(r, rec, attenuation, scattered))
-            return emitted + attenuation * ray_color(scattered, ambient, world, depth - 1, first_depth);
-        return color(0, 0, 0);
-    }
-    else if (depth == first_depth)
-        return background(r);
-    else {
-        return ambient;
-    }
-}
-
 int main()
 {
     //Setup image
@@ -152,11 +112,12 @@ int main()
 
     gr Sample_Scene;
     std::vector<shared_ptr<hitable>> Lights; 
+    Sample_Scene.cube("Cubo");
+    Sample_Scene.nh_sphere("Piso", point3(0, -1000, 0), 1000.0);
+    Lights.push_back(make_shared<spotlight>(point3(0, 1, 5), color(4, 4, 4),     vec3(1,0,0), "Lamp1"));
+    Lights.push_back(make_shared<spotlight>(point3(0, 1, -5), color(5, 5, 5),    vec3(1,0,0), "Lamp2"));
+    Lights.push_back(make_shared<spotlight>(point3(10, 1, 0), color(10, 10, 10), vec3(1,0,0), "Lamp3"));
 
-    Lights.push_back(make_shared<light>("Lamp1", point3(0, 0, 0), color(0.4, 0.4, 0.4))); 
-    Lights.push_back(make_shared<light>("Lamp2", point3(0, 1, 0), color(0.2, 0.2, 0.2)));
-    Lights.push_back(make_shared<light>("Lamp3", point3(1, 0, 0), color(0.1, 0.1, 0.1)));
-
-    Sample_Scene.render("Something", "image2.ppm", 200, 100, point3(26, 3, 6), point3(0, 2, 0), vec3(0, 1, 0), 20.0, color(0.1, 0.1, 0.1), Lights);
+    Sample_Scene.render("Something", "image2.ppm", 400, 200, point3(26, 3, 6), point3(0, 0, 0), vec3(0, 1, 0), 20.0, color(0.1, 0.1, 0.1), Lights);
 }
 
