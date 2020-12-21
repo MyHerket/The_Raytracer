@@ -19,6 +19,7 @@
 #include "Polygons.h"
 #include "Camera.h"
 #include "color.h"
+#include "OBJLoader.h"
 
 using namespace std;
 
@@ -27,7 +28,7 @@ color background(const ray& r) {
 	vec3 unit_direction = unit_vector(r.direction());
 	auto t = 0.5 * (unit_direction.z() + 1.0);
 	color back3(0.0, 0.0, 1.0);
-	color back1(0.0, 0.0, 0.0);
+	color back1(1.0, 1.0, 1.0);
 	color back2(0.0, 1.0, 0.0);
 
 	if (t <= 0.5) {
@@ -49,10 +50,14 @@ color ray_color(const ray& r, const color& ambient, const hitable& world, int de
 		ray scattered;
 		color attenuation;
 		color emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
-		if (!rec.mat_ptr->scatter(r, rec, attenuation, scattered))
+		double pdf;
+		color albedo;
+
+		if (!rec.mat_ptr->scatter(r, rec, albedo, scattered, pdf))
 			return emitted;
-		if (rec.mat_ptr->scatter(r, rec, attenuation, scattered))
-			return emitted + attenuation * ray_color(scattered, ambient, world, depth - 1, first_depth);
+		if (rec.mat_ptr->scatter(r, rec, attenuation, scattered, pdf))
+			return emitted + attenuation * rec.mat_ptr->scatter_pdf(r, rec, scattered) * 
+			ray_color(scattered, ambient, world, depth - 1, first_depth)/pdf;
 		return color(0, 0, 0);
 	}
 	else if (depth == first_depth)
@@ -106,15 +111,20 @@ public:
 		world.add(lamp);
 	}
 
+	void loadMesh(const char* name, const char* filename, const shared_ptr<material> mat) {
+		Mesh_Struct OBJMesh = loadOBJ(filename); 
+		mesh(name, OBJMesh.position, OBJMesh.index_vertices, mat);
+	}
+
 	void render(
 		const char* node, const char* filename, int w, int h, const point3& eye, const point3& view,
 		const point3& up, double fov, const color& ambient, vector<shared_ptr<hitable>> lights) {
 		
 		//Other Parameters	
-		int samples_per_pixel = 100;
-		const int max_depth = 50;
+		int samples_per_pixel = 50;
+		const int max_depth = 20;
 		auto aspect_ratio = w / h;
-		auto aperture = 0.1;
+		auto aperture = 0.0;
 
 		//Setup Camera
 		auto disk_to_focus = 10.0;

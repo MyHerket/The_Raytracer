@@ -20,15 +20,15 @@ public:
 		point3 max(fmax(fmax(v1.x(), v2.x()), v3.x()), fmax(fmax(v1.y(), v2.y()), v3.y()), fmax(fmax(v1.z(), v2.z()), v3.z()));
 
 		auto outward_normal = unit_vector(cross((v2 - v1), (v3 - v1)));
-		if (outward_normal == vec3(1, 0, 0)){
+		if (outward_normal*outward_normal == vec3(1, 0, 0)){
 			min += vec3(-0.0001, 0, 0);
 			max += vec3(0.0001, 0, 0);
 		}
-		else if (outward_normal == vec3(0, 1, 0)) {
+		else if (outward_normal * outward_normal == vec3(0, 1, 0)) {
 			min += vec3(0, -0.0001, 0);
 			max += vec3(0, 0.0001, 0);
 		}
-		else if (outward_normal == vec3(0, 0, 1)) {
+		else if (outward_normal * outward_normal == vec3(0, 0, 1)) {
 			min += vec3(0, 0, -0.0001);
 			max += vec3(0, 0, 0.0001);
 		}
