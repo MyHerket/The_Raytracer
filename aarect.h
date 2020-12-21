@@ -20,6 +20,22 @@ public:
 		return true;
 	}
 
+	virtual double pdf_value(const point3& origin, const vec3& v)const override {
+		hit_record rec; 
+		if (!this->hit(ray(origin, v), 0.001, infinity, rec))
+			return 0;
+		auto area = (x1 - x0) * (y1 - y0);
+		auto distance_squared = rec.t * rec.t * v.lenght_squared();
+		auto cosine = fabs(dot(v, rec.normal)) / v.lenght();
+
+		return distance_squared / (cosine * area);
+	}
+
+	virtual vec3 random(const point3& origin) const override {
+		auto random_point = point3(random_double(x0, x1), random_double(y0, y1), k);
+		return random_point - origin;
+	}
+
 	shared_ptr<material> mp; 
 	double x0, x1, y0, y1, k;
 	const char* name;
@@ -58,6 +74,22 @@ public:
 		return true;
 	}
 
+	virtual double pdf_value(const point3& origin, const vec3& v)const override {
+		hit_record rec;
+		if (!this->hit(ray(origin, v), 0.001, infinity, rec))
+			return 0;
+		auto area = (y1 - y0) * (z1 - z0);
+		auto distance_squared = rec.t * rec.t * v.lenght_squared();
+		auto cosine = fabs(dot(v, rec.normal)) / v.lenght();
+
+		return distance_squared / (cosine * area);
+	}
+
+	virtual vec3 random(const point3& origin) const override {
+		auto random_point = point3( k, random_double(y0, y1), random_double(z0, z1) );
+		return random_point - origin;
+	}
+
 	shared_ptr<material> mp;
 	double y0, y1, z0, z1, k;
 	const char* name;
@@ -94,6 +126,22 @@ public:
 		//dimension a small amount
 		output_box = aabb(point3(x0, k - 0.0001, z0), point3(x1,  k + 0.0001, z1));
 		return true;
+	}
+
+	virtual double pdf_value(const point3& origin, const vec3& v)const override {
+		hit_record rec;
+		if (!this->hit(ray(origin, v), 0.001, infinity, rec))
+			return 0;
+		auto area = (x1 - x0) * (z1 - z0);
+		auto distance_squared = rec.t * rec.t * v.lenght_squared();
+		auto cosine = fabs(dot(v, rec.normal)) / v.lenght();
+
+		return distance_squared / (cosine * area);
+	}
+
+	virtual vec3 random(const point3& origin) const override {
+		auto random_point = point3(random_double(x0, x1), k, random_double(z0, z1));
+		return random_point - origin;
 	}
 
 	shared_ptr<material> mp;

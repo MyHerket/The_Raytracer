@@ -142,6 +142,7 @@
     <ClCompile Include="TheRaytracer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ONB.h" />
     <ClInclude Include="aarect.h" />
     <ClInclude Include="Bounding_Volume.h" />
     <ClInclude Include="Bounding_Volume_Tree.h" />
@@ -152,6 +153,7 @@
     <ClInclude Include="material.h" />
     <ClInclude Include="moving_sphere.h" />
     <ClInclude Include="OBJLoader.h" />
+    <ClInclude Include="pdf.h" />
     <ClInclude Include="Perlin.h" />
     <ClInclude Include="Polygons.h" />
     <ClInclude Include="ray.h" />

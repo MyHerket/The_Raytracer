@@ -4,7 +4,8 @@
 #define PDF_H
 
 #include "rtweekend.h"
-#include "OBN.h"
+#include "ONB.h"
+#include "hitable.h"
 
 class pdf {
 public: 
@@ -27,7 +28,8 @@ inline vec3 random_cosine_direction() {
 
 class cosine_pdf : public pdf {
 public: 
-	cosine_pdf(const vec3& w) { uvw.build_from_w(w); }
+	cosine_pdf() {}
+	cosine_pdf (const vec3& w) { uvw.build_from_w(w); }
 	virtual double value(const vec3& direction) {
 		auto cosine = dot(unit_vector(direction), uvw.w());
 		return (cosine <= 0) ? 0 : cosine / pi;
@@ -38,5 +40,22 @@ public:
 
 public: 
 	onb uvw;
+};
+
+class hitable_pdf : public pdf {
+public: 
+	hitable_pdf(shared_ptr<hitable> p, const point3& origin) : ptr(p), o(origin) {}
+
+	virtual double value(const vec3& direction)const override {
+		return ptr->pdf_value(o, direction); 
+	}
+
+	virtual vec3 generate() const override {
+		return ptr->random(o);
+	}
+
+public: 
+	point3 o; 
+	shared_ptr<hitable> ptr;
 };
 #endif // !PDF_H

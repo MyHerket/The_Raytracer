@@ -86,7 +86,7 @@ public:
 polygon::polygon(const std::vector<point3>& positions, const std::vector<int>& v, shared_ptr<material> ptr, const char* _name) {
 	name = _name;
 	for (std::size_t i = 1; i < v.size()-1; ++i) {
-		sides.add(make_shared<triangle>(positions[v[0]], positions[v[i]], positions[v[i + 1]], ptr, _name));
+		sides.add(make_shared<triangle>(positions[v[0]], positions[v[i + 1]], positions[v[i]], ptr, _name));
 	}
 }
 

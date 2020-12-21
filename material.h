@@ -5,6 +5,14 @@
 #include "rtweekend.h"
 #include "hitable_list.h"
 #include "Texture.h"
+#include "pdf.h"
+
+struct scatter_record {
+	ray specular_ray; 
+	bool is_specular; 
+	color attenuation; 
+	shared_ptr<pdf> pdf_ptr;
+};
 
 struct hit_record; 
 class material {
@@ -12,8 +20,13 @@ public:
 	virtual color emitted(double u, double v, const point3& p) const {
 		return color(0, 0, 0);
 	}
-	virtual bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const {
+	virtual bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered, double& pdf) const {
 		return false;
+	}
+	virtual double scattering_pdf(
+		const ray& r_in, const hit_record& rec, const ray& scattered
+	) const {
+		return 0;
 	}
 };
 
@@ -25,17 +38,23 @@ public:
 	lambertian(shared_ptr<texture> a) : albedo(a) {}
 
 	virtual bool scatter(
-		const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered
+		const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered, double& pdf
 	)const override {
-		auto scatter_direction = rec.normal + random_unit_vector();
-
-		//Catch degenerate scatter direction;
-		if (scatter_direction.near_zero())
-			scatter_direction = rec.normal;
-		
-		scattered = ray(rec.p, unit_vector(scatter_direction), r_in.time()); //Revisar
+		onb uvw; 
+		uvw.build_from_w(rec.normal); 
+		auto direction = uvw.local(random_cosine_direction()); 
+		scattered = ray(rec.p, unit_vector(direction), r_in.time()); 
 		attenuation = albedo->value(rec.u, rec.v, rec.p); 
+		pdf = dot(uvw.w(), scattered.direction()) / pi;
 		return true;
+
+	}
+
+	double scattering_pdf(
+		const ray& r_in, const hit_record& rec, const ray& scattered
+	)const {
+		auto cosine = dot(rec.normal, unit_vector(scattered.direction())); 
+		return cosine < 0 ? 0 : cosine / pi;
 	}
 
 public: 
@@ -47,7 +66,7 @@ public:
 	metal(const color& a, double f) : albedo(a), fuzz(f<1 ? f:1) {}
 
 	virtual bool scatter(
-		const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered
+		const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered, double& pdf
 	) const override {
 		vec3 reflected = reflect(unit_vector(r_in.direction()), rec.normal); 
 		scattered = ray(rec.p, reflected + fuzz*random_in_unit_sphere(), r_in.time()); 
@@ -67,7 +86,7 @@ public:
 	dielectric(double index_of_refraction) : ir(index_of_refraction) {}
 
 	virtual bool scatter(
-		const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered
+		const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered, double& pdf
 	)const override {
 		attenuation = color(1.0, 1.0, 1.0);
 		double refraction_ratio = (rec.front_face ? (1.0 / ir) : ir);
@@ -105,7 +124,7 @@ public:
 	diffuse_light(color c) : emit(make_shared<solid_color>(c)) {}
 
 	virtual bool scatter(
-		const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered
+		const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered, double& pdf
 	) const override {
 		return false;
 	}
@@ -123,7 +142,7 @@ public:
 	diffuse_light_s(color c, vec3 attenuation, double radius) : emit(make_shared<solid_color>(c)), c(attenuation), r(radius) {}
 
 	virtual bool scatter(
-		const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered
+		const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered, double& pdf
 	) const override {
 		return false;
 	}
