@@ -41,29 +41,29 @@ color background(const ray& r) {
 
 }
 
-color ray_color(const ray& r, const color& ambient, const hitable& world, shared_ptr<hitable>& lights, int depth, int first_depth) {
+color ray_color(
+	const ray& r, const color& ambient, const hitable& world, 
+	const shared_ptr<hitable>& lights, int depth, int first_depth) {
 	hit_record rec;
 	if (depth <= 0)
 		return ambient;
 
 	if (world.hit(r, 0.001, infinity, rec)) {
-		ray scattered;
-		color attenuation;
-		color emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
-		double pdf_val; 
-		color albedo;
-
-		if (!rec.mat_ptr->scatter(r, rec, albedo, scattered, pdf_val))
+		scatter_record srec; 
+		color emitted = rec.mat_ptr->emitted(r, rec, rec.u, rec.v, rec.p);
+		if (!rec.mat_ptr->scatter(r, rec, srec))
 			return emitted;
-		else {
-			hitable_pdf light_pdf(lights, rec.p); 
-			scattered = ray(rec.p, light_pdf.generate(), r.time()); 
-			pdf_val = light_pdf.value(scattered.direction());
-			return emitted + albedo *
-				ray_color(scattered, ambient, world, lights, depth - 1, first_depth) / pdf_val
-				* rec.mat_ptr->scattering_pdf(r, rec, scattered);
-		}
-		return color(0, 0, 0);
+		if (srec.is_specular)
+			return srec.attenuation * ray_color(srec.specular_ray, ambient, world, lights, depth - 1, first_depth);
+		auto light_ptr = make_shared<hitable_pdf>(lights, rec.p);
+		mixture_pdf p(light_ptr, srec.pdf_ptr);
+
+		ray scattered = ray(rec.p, p.generate(), r.time());
+		auto pdf_val = p.value(scattered.direction());
+
+		return emitted + srec.attenuation * rec.mat_ptr->scattering_pdf(r, rec, scattered)
+			* ray_color(scattered, ambient, world, lights, depth - 1, first_depth) / pdf_val;
+	
 	}
 	else if (depth == first_depth)
 		return background(r);
@@ -77,6 +77,7 @@ public:
 	hitable_list world; 
 	ifstream in_file;
 	shared_ptr<material> def;
+	hitable_list Lamps;
 
 	gr() {}
 	gr(const char* name, const shared_ptr<material> mtp) {
@@ -113,7 +114,7 @@ public:
 
 	void light(const char* name, const point3& position, const color& intensity, const vec3& attenuation){
 		auto lamp = make_shared<spotlight>(position, intensity, attenuation, name);
-		world.add(lamp);
+		Lamps.add(lamp);
 	}
 
 	void loadMesh(const char* name, const char* filename, const shared_ptr<material> mat) {
@@ -126,7 +127,7 @@ public:
 		const point3& up, double fov, const color& ambient, vector<shared_ptr<hitable>> lights) {
 		
 		//Other Parameters	
-		int samples_per_pixel = 500;
+		int samples_per_pixel = 200;
 		const int max_depth = 20;
 		auto aspect_ratio = w / h;
 		auto aperture = 0.0;
@@ -137,7 +138,7 @@ public:
 
 		//Adding lights
 		for (const auto& lamps: lights) {
-			world.add(lamps);
+			Lamps.add(lamps);
 		}
 
 		//Render
@@ -159,7 +160,7 @@ public:
 					auto v = (j + random_double()) / (h - 1.0);
 					ray r = cam.get_ray(u, v);
 					vec3 p = r.at(2.0);
-					pixel_color += ray_color(r, ambient, world, lights[0], max_depth, max_depth);
+					pixel_color += ray_color(r, ambient, world, Lamps.objects[0], max_depth, max_depth);
 				}
 				write_color(file, pixel_color, samples_per_pixel);
 

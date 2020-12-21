@@ -113,8 +113,8 @@ int main()
     gr Sample_Scene;
     std::vector<shared_ptr<hitable>> Lights; 
     auto pink = make_shared<lambertian>(color(0.9, 128 / 255, 192 / 255));
-    auto metal_blue = make_shared<metal>(color(0.05, 0.05, 0.7), 0.5);
-    //Sample_Scene.cube("Cubo", metal_blue);
+    auto metal_blue = make_shared<metal>(color(0.05, 0.05, 0.7), 0.0);
+    Sample_Scene.cube("Cubo", metal_blue);
     Sample_Scene.nh_sphere("Piso", point3(0, -1001, 0), 1000.0, pink);
     Lights.push_back(make_shared<spotlight>(point3(0, 1, 5), color(4, 4, 4),     vec3(1,0,0), "Lamp1"));
     Lights.push_back(make_shared<spotlight>(point3(0, 1, -5), color(5, 5, 5),    vec3(1,0,0), "Lamp2"));
@@ -139,10 +139,10 @@ int main()
     Penta.index_vertices.push_back(ind);
     Sample_Scene.mesh("Pent", Penta.position, Penta.index_vertices, metal_blue);*/
 
-    Sample_Scene.loadMesh("cubo", "cube2.obj", pink);
+    //Sample_Scene.loadMesh("cubo", "cube2.obj", pink);
 
 
-    Sample_Scene.render("Something", "image2.ppm", 300, 200, point3(26, 3, 6), point3(0, 2, 0), vec3(0, 1, 0), 20.0, color(0.1, 0.1, 0.1), Lights);
+    Sample_Scene.render("Something", "image2.ppm", 600, 200, point3(26, 3, 6), point3(0, 0, 0), vec3(0, 1, 0), 20.0, color(0.1, 0.1, 0.1), Lights);
 
 
 
