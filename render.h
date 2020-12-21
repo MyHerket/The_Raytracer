@@ -50,14 +50,12 @@ color ray_color(const ray& r, const color& ambient, const hitable& world, int de
 		ray scattered;
 		color attenuation;
 		color emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
-		double pdf;
-		color albedo;
 
-		if (!rec.mat_ptr->scatter(r, rec, albedo, scattered, pdf))
+		if (!rec.mat_ptr->scatter(r, rec, attenuation, scattered))
 			return emitted;
-		if (rec.mat_ptr->scatter(r, rec, attenuation, scattered, pdf))
-			return emitted + attenuation * rec.mat_ptr->scatter_pdf(r, rec, scattered) * 
-			ray_color(scattered, ambient, world, depth - 1, first_depth)/pdf;
+		if (rec.mat_ptr->scatter(r, rec, attenuation, scattered))
+			return emitted + attenuation * 
+			ray_color(scattered, ambient, world, depth - 1, first_depth);
 		return color(0, 0, 0);
 	}
 	else if (depth == first_depth)

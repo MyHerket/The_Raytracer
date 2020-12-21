@@ -12,11 +12,8 @@ public:
 	virtual color emitted(double u, double v, const point3& p) const {
 		return color(0, 0, 0);
 	}
-	virtual bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered, double& pdf) const {
+	virtual bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const {
 		return false;
-	}
-	virtual double scatter_pdf(const ray& r_in, const hit_record& rec, const ray& scattered)const {
-		return 0;
 	}
 };
 
@@ -28,7 +25,7 @@ public:
 	lambertian(shared_ptr<texture> a) : albedo(a) {}
 
 	virtual bool scatter(
-		const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered, double& pdf
+		const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered
 	)const override {
 		auto scatter_direction = rec.normal + random_unit_vector();
 
@@ -36,17 +33,9 @@ public:
 		if (scatter_direction.near_zero())
 			scatter_direction = rec.normal;
 		
-		scattered = ray(rec.p, unit_vector(r_in.direction()), r_in.time()); //Revisar
+		scattered = ray(rec.p, unit_vector(scatter_direction), r_in.time()); //Revisar
 		attenuation = albedo->value(rec.u, rec.v, rec.p); 
-		pdf = dot(rec.normal, scattered.direction()) / pi;
 		return true;
-	}
-
-	double scattering_pdf(
-		const ray& r_in, const hit_record& rec, const ray& scattered
-	)const {
-		auto cosine = dot(rec.normal, unit_vector(scattered.direction()));
-		return cosine < 0 ? 0 : cosine / pi;
 	}
 
 public: 
