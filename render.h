@@ -137,8 +137,30 @@ public:
 		mesh(name, OBJMesh.position, OBJMesh.index_vertices, mat);
 	}
 
-	void move(const char* name, const vec3& displacement) {
+	int find(const char* name) {
+		auto itr = find_if(world.objects.cbegin(), world.objects.cend(), compare("name"));
 
+		if (itr != world.objects.cend()) {
+			cout << "Element present at index " <<
+				distance(world.objects.cbegin(), itr);
+			return distance(world.objects.cbegin(), itr);
+		}
+		else {
+			std::cout << "Element not found";
+			return NULL;
+		}
+	}
+
+	void move(const char* name, const vec3& displacement) {
+		int itr = find(name); 
+		world.objects[itr] = make_shared<translate>(world.objects[itr], displacement);
+	}
+
+	void rotate(const char* name, const vec3& rotation) {
+		int itr = find(name); 
+		world.objects[itr] = make_shared<rotate_x>(world.objects[itr], rotation[0]);
+		world.objects[itr] = make_shared<rotate_y>(world.objects[itr], rotation[1]);
+		world.objects[itr] = make_shared<rotate_z>(world.objects[itr], rotation[2]);
 	}
 
 	void render(
@@ -146,7 +168,7 @@ public:
 		const point3& up, double fov, const color& ambient, shared_ptr<hitable> lights) {
 		
 		//Other Parameters	
-		int samples_per_pixel = 200;
+		int samples_per_pixel = 50;
 		const int max_depth = 50;
 		auto aspect_ratio = w / h;
 		auto aperture = 0.0;
@@ -166,9 +188,8 @@ public:
 
 		file << "P3\n" << w << " " << h << "\n255\n";
 
-		int k = h - 1;
 		for (int j = h - 1; j >= 0; --j) {
-			std::cout << "\rScanlines remaining: " << (j/k)*100 << "%" << std::flush;
+			std::cout << "\rScanlines remaining: " << j << " Processed " <<(1.0 - double(j/(h-1)))*100 << "%" << " " << std::flush;
 			for (int i = 0; i < w; ++i) {
 				color pixel_color(0.0, 0.0, 0.0);
 				for (int s = 0; s < samples_per_pixel; ++s) {

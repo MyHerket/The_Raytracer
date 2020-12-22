@@ -26,22 +26,14 @@ int main()
     auto metal_blue = make_shared<metal>(color(0.05, 0.05, 0.7), 1.0);
     auto glass = make_shared<dielectric>(1.3);
     Sample_Scene.cube("Cubo", metal_blue);
-    //Sample_Scene.cube("Cubo_de_Vidrio", glass);
     Sample_Scene.nh_sphere("Piso", point3(0, -1001, 0), 1000.0, pink);
     Sample_Scene.light("Lamp1", point3(0, 1, 5), color(10, 10, 10), vec3(1, 0, 0));
     Sample_Scene.light("Lamp2", point3(0, 1, -5), color(5, 5, 5),    vec3(1,0,0));
     Sample_Scene.light("Lamp3", point3(10, 1, 0), color(10, 10, 10), vec3(1,0,0));
+    Sample_Scene.move("Cubo", vec3(1.0, 1.0, 1.0));
+    Sample_Scene.rotate("Cubo", vec3(45, 0, 30));
 
-    /*auto itr = std::find_if(Sample_Scene.world.objects.cbegin(), Sample_Scene.world.objects.cend(), compare("Cubo"));
-
-    if (itr != Sample_Scene.world.objects.cend()) {
-        std::cout << "Element present at index " <<
-            std::distance(Sample_Scene.world.objects.cbegin(), itr);
-    }
-    else {
-        std::cout << "Element not found";
-    }*/
-
+    
     //Pentagono 
     /*Mesh_Struct Penta; 
 
@@ -64,7 +56,8 @@ int main()
     //Sample_Scene.loadMesh("cubo", "cube2.obj", pink);
 
 
-    Sample_Scene.render("Something", "image3.ppm", 600, 300, point3(26, 3, 6), point3(0, 0, 0), vec3(0, 1, 0), 20.0, color(0.1, 0.1, 0.1), lights);
+    Sample_Scene.render("Something", "image2.ppm", 200, 100, point3(26, 3, 6), point3(0, 0, 0), vec3(0, 1, 0), 20.0, color(0.1, 0.1, 0.1), lights);
+    
 
 
 
