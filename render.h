@@ -37,9 +37,9 @@ struct compare
 color background(const ray& r) {
 	vec3 unit_direction = unit_vector(r.direction());
 	auto t = 0.5 * (unit_direction.z() + 1.0);
-	color back3(0.0, 0.0, 1.0);
-	color back1(1.0, 1.0, 1.0);
-	color back2(0.0, 1.0, 0.0);
+	color back3(0.6, 0.0, 0.3);
+	color back1(0, 0, 0);
+	color back2(0.34, 0.13, 0.4);
 
 	if (t <= 0.5) {
 		return (1.0 - 2 * t) * back1 + 2 * t * back2;
@@ -68,7 +68,7 @@ color ray_color(
 		if (!rec.mat_ptr->scatter(r, rec, srec))
 			return emitted;
 		if (srec.is_specular)
-			return srec.attenuation
+			return emitted
 			* ray_color(srec.specular_ray, ambient, world, lights, depth - 1, first_depth);
 		auto light_ptr = make_shared<hitable_pdf>(lights, rec.p);
 		mixture_pdf p(light_ptr, srec.pdf_ptr);
@@ -141,12 +141,9 @@ public:
 		auto itr = find_if(world.objects.cbegin(), world.objects.cend(), compare("name"));
 
 		if (itr != world.objects.cend()) {
-			cout << "Element present at index " <<
-				distance(world.objects.cbegin(), itr);
 			return distance(world.objects.cbegin(), itr);
 		}
 		else {
-			std::cout << "Element not found";
 			return NULL;
 		}
 	}
@@ -163,12 +160,17 @@ public:
 		world.objects[itr] = make_shared<rotate_z>(world.objects[itr], rotation[2]);
 	}
 
+	void scaling(const char* name, double scalation) {
+		int itr = find(name); 
+		world.objects[itr] = make_shared<scale>(world.objects[itr], 1/scalation);
+	}
+
 	void render(
 		const char* node, const char* filename, int w, int h, const point3& eye, const point3& view,
 		const point3& up, double fov, const color& ambient, shared_ptr<hitable> lights) {
 		
 		//Other Parameters	
-		int samples_per_pixel = 50;
+		int samples_per_pixel = 200;
 		const int max_depth = 50;
 		auto aspect_ratio = w / h;
 		auto aperture = 0.0;
@@ -189,7 +191,7 @@ public:
 		file << "P3\n" << w << " " << h << "\n255\n";
 
 		for (int j = h - 1; j >= 0; --j) {
-			std::cout << "\rScanlines remaining: " << j << " Processed " <<(1.0 - double(j/(h-1)))*100 << "%" << " " << std::flush;
+			std::cout << "\rScanlines remaining: " << j  << " " << std::flush;
 			for (int i = 0; i < w; ++i) {
 				color pixel_color(0.0, 0.0, 0.0);
 				for (int s = 0; s < samples_per_pixel; ++s) {

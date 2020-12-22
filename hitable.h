@@ -317,5 +317,35 @@ bool rotate_x::hit(const ray& r, double t_min, double t_max, hit_record& rec)con
 
 }
 
+class scale : public hitable {
+public:
+	scale(shared_ptr<hitable> p, double scalation) : ptr(p), sc(scalation) {}
+
+	virtual bool hit(const ray& r, double t_min, double t_max, hit_record& rec) const override;
+
+	virtual bool bounding_box(double time0, double time1, aabb& output_box)const override;
+
+public:
+	shared_ptr<hitable> ptr;
+	double sc;
+};
+
+bool scale::hit(const ray& r, double t_min, double t_max, hit_record& rec) const {
+	ray moved_r(r.origin()*sc, r.direction(), r.time());
+	if (!ptr->hit(moved_r, t_min, t_max, rec))
+		return false;
+	rec.p *= sc;
+	rec.set_face_normal(moved_r, rec.normal);
+	return true;
+}
+
+bool scale::bounding_box(double time0, double time1, aabb& output_box) const {
+	if (!ptr->bounding_box(time0, time1, output_box))
+		return false;
+	output_box = aabb(output_box.min() *sc, output_box.max() *sc);
+
+	return true;
+}
+
 #endif
 
