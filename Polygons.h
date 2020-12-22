@@ -36,6 +36,9 @@ public:
 		output_box = aabb(min, max);
 		return true;
 	}
+	virtual const char* get_name()const override {
+		return name;
+	}
 
 	shared_ptr<material> mp;
 	point3 v1; 
@@ -77,6 +80,9 @@ public:
 	virtual bool bounding_box(double time0, double time1, aabb& output_box) const override {
 		return sides.bounding_box(time0, time1, output_box);
 	}
+	virtual const char* get_name()const override {
+		return name;
+	}
 
 public:
 	const char* name;
@@ -104,6 +110,9 @@ public:
 
 	virtual bool bounding_box(double time0, double time1, aabb& output_box) const override {
 		return sides.bounding_box(time0, time1, output_box);
+	}
+	virtual const char* get_name()const override {
+		return name;
 	}
 
 public:

@@ -35,6 +35,9 @@ public:
 		auto random_point = point3(random_double(x0, x1), random_double(y0, y1), k);
 		return random_point - origin;
 	}
+	virtual const char* get_name()const override {
+		return name;
+	}
 
 	shared_ptr<material> mp; 
 	double x0, x1, y0, y1, k;
@@ -89,6 +92,9 @@ public:
 		auto random_point = point3( k, random_double(y0, y1), random_double(z0, z1) );
 		return random_point - origin;
 	}
+	virtual const char* get_name()const override {
+		return name;
+	}
 
 	shared_ptr<material> mp;
 	double y0, y1, z0, z1, k;
@@ -142,6 +148,9 @@ public:
 	virtual vec3 random(const point3& origin) const override {
 		auto random_point = point3(random_double(x0, x1), k, random_double(z0, z1));
 		return random_point - origin;
+	}
+	virtual const char* get_name()const override {
+		return name;
 	}
 
 	shared_ptr<material> mp;

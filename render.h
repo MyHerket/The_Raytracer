@@ -23,6 +23,16 @@
 
 using namespace std;
 
+struct compare
+{
+	const char* key;
+	compare(const char* i) : key(i) { }
+
+	bool operator()(shared_ptr<hitable> i)
+	{
+		return (strcmp(i->get_name(), key));
+	}
+};
 
 color background(const ray& r) {
 	vec3 unit_direction = unit_vector(r.direction());
@@ -45,7 +55,7 @@ color ray_color(
 	const ray& r, 
 	const color& ambient,
 	const hitable& world, 
-	const shared_ptr<hitable_list>& lights, 
+	shared_ptr<hitable> lights, 
 	int depth, 
 	int first_depth) {
 	hit_record rec;
@@ -119,13 +129,16 @@ public:
 
 	void light(const char* name, const point3& position, const color& intensity, const vec3& attenuation){
 		auto lamp = make_shared<spotlight>(position, intensity, attenuation, name);
-		//world.add(lamp);
-		Lamps->add(lamp);
+		world.add(lamp);
 	}
 
 	void loadMesh(const char* name, const char* filename, const shared_ptr<material> mat) {
 		Mesh_Struct OBJMesh = loadOBJ(filename); 
 		mesh(name, OBJMesh.position, OBJMesh.index_vertices, mat);
+	}
+
+	void move(const char* name, const vec3& displacement) {
+
 	}
 
 	void render(
@@ -142,11 +155,6 @@ public:
 		auto disk_to_focus = 10.0;
 		camera cam(eye,view, up, fov, aspect_ratio, aperture, disk_to_focus, 0.0, 1.0);
 
-		//Adding lights
-		for (const auto& lamps: lights) {
-			Lamps->add(lamps);
-			//world.add(lamps);
-		}
 
 		//Render
 
@@ -158,8 +166,9 @@ public:
 
 		file << "P3\n" << w << " " << h << "\n255\n";
 
+		int k = h - 1;
 		for (int j = h - 1; j >= 0; --j) {
-			std::cout << "\rScanlines remaining: " << j << " " << std::flush;
+			std::cout << "\rScanlines remaining: " << (j/k)*100 << "%" << std::flush;
 			for (int i = 0; i < w; ++i) {
 				color pixel_color(0.0, 0.0, 0.0);
 				for (int s = 0; s < samples_per_pixel; ++s) {
@@ -167,7 +176,7 @@ public:
 					auto v = (j + random_double()) / (h - 1.0);
 					ray r = cam.get_ray(u, v);
 					vec3 p = r.at(2.0);
-					pixel_color += ray_color(r, ambient, world, Lamps, max_depth, max_depth);
+					pixel_color += ray_color(r, ambient, world, lights, max_depth, max_depth);
 				}
 				write_color(file, pixel_color, samples_per_pixel);
 

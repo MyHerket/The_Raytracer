@@ -14,15 +14,33 @@ int main()
 {
 
     scene Sample_Scene;
-    auto Lights = make_shared<hitable_list>(make_shared<spotlight>(point3(0, 1, 5), color(4, 4, 4), vec3(1, 0, 0), "Lamp1"));
-    auto pink = make_shared<lambertian>(color(0.9, 128 / 255, 192 / 255));
-    auto metal_blue = make_shared<metal>(color(0.05, 0.05, 0.7), 0.7);
-    auto glass = make_shared<dielectric>()
-    Sample_Scene.cube("Cubo", metal_blue);
-    Sample_Scene.nh_sphere("Piso", point3(0, -1001, 0), 1000.0, pink);
-    Lights->add(make_shared<spotlight>(point3(0, 1, -5), color(5, 5, 5),    vec3(1,0,0), "Lamp2"));
-    Lights->add(make_shared<spotlight>(point3(10, 1, 0), color(10, 10, 10), vec3(1,0,0), "Lamp3"));
+    //auto Lights = make_shared<hitable_list>();
+    //Lights->add(make_shared<sphere>(point3(10, 1, 0), 0.5, 0));
+    auto lights = make_shared<hitable_list>();
+    lights->add(make_shared<sphere>(point3(0, 1,  5), 0.25, shared_ptr<material>()));
+    lights->add(make_shared<sphere>(point3(0, 1, -5), 0.25, shared_ptr<material>()));
+    lights->add(make_shared<sphere>(point3(10, 1, 0), 0.25, shared_ptr<material>()));
 
+
+    auto pink = make_shared<lambertian>(color(0.9, 128 / 255, 192 / 255));
+    auto metal_blue = make_shared<metal>(color(0.05, 0.05, 0.7), 1.0);
+    auto glass = make_shared<dielectric>(1.3);
+    Sample_Scene.cube("Cubo", metal_blue);
+    //Sample_Scene.cube("Cubo_de_Vidrio", glass);
+    Sample_Scene.nh_sphere("Piso", point3(0, -1001, 0), 1000.0, pink);
+    Sample_Scene.light("Lamp1", point3(0, 1, 5), color(10, 10, 10), vec3(1, 0, 0));
+    Sample_Scene.light("Lamp2", point3(0, 1, -5), color(5, 5, 5),    vec3(1,0,0));
+    Sample_Scene.light("Lamp3", point3(10, 1, 0), color(10, 10, 10), vec3(1,0,0));
+
+    /*auto itr = std::find_if(Sample_Scene.world.objects.cbegin(), Sample_Scene.world.objects.cend(), compare("Cubo"));
+
+    if (itr != Sample_Scene.world.objects.cend()) {
+        std::cout << "Element present at index " <<
+            std::distance(Sample_Scene.world.objects.cbegin(), itr);
+    }
+    else {
+        std::cout << "Element not found";
+    }*/
 
     //Pentagono 
     /*Mesh_Struct Penta; 
@@ -46,7 +64,7 @@ int main()
     //Sample_Scene.loadMesh("cubo", "cube2.obj", pink);
 
 
-    Sample_Scene.render("Something", "image2.ppm", 600, 300, point3(26, 3, 6), point3(0, 0, 0), vec3(0, 1, 0), 20.0, color(0.1, 0.1, 0.1), Lights);
+    Sample_Scene.render("Something", "image3.ppm", 600, 300, point3(26, 3, 6), point3(0, 0, 0), vec3(0, 1, 0), 20.0, color(0.1, 0.1, 0.1), lights);
 
 
 

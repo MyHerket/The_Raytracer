@@ -13,7 +13,10 @@ public:
     virtual bool hit(const ray& r, double tmin, double tmax, hit_record& rec) const override;
     virtual bool bounding_box(double time0, double time1, aabb& output_box) const override;
     virtual double pdf_value(const point3& o, const vec3& v) const override;
-    virtual vec3 random(const vec3& o) const override;
+    virtual vec3 random(const vec3& o) const override; 
+    virtual const char* get_name()const override {
+        return name;
+    }
 
 public:
     const char* name;
@@ -97,6 +100,9 @@ public:
     virtual bool bounding_box(double time0, double time1, aabb& output_box) const override;
     virtual double pdf_value(const point3& o, const vec3& v) const override;
     virtual vec3 random(const vec3& o) const override;
+    virtual const char* get_name()const override {
+        return name;
+    }
 
 public:
     const char* name;

@@ -17,6 +17,9 @@ public:
 		output_box = aabb(box_min, box_max); 
 		return true;
 	}
+	virtual const char* get_name()const override {
+		return name;
+	}
 
 public: 
 	const char* name;

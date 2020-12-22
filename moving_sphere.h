@@ -22,6 +22,10 @@ public:
 
 	point3 center(double time) const; 
 
+	virtual const char* get_name()const override {
+		return name;
+	}
+
 public: 
 	const char* name;
 	point3 center0, center1; 

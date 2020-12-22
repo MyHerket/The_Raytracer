@@ -32,7 +32,9 @@ public:
 	virtual vec3 random(const vec3& o) const {
 		return vec3(1, 0, 0);
 	}
-
+	virtual const char* get_name()const {
+		return "NULL";
+	}
 };
 
 
