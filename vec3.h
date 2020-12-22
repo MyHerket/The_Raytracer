@@ -185,6 +185,14 @@ public:
   using point3 = vec3; 
   using color = vec3;
 
+
+vec3 clamp_vec(vec3 v, double min, double max) {
+	  v[0] = clamp(v[0], min, max);
+	  v[1] = clamp(v[1], min, max);
+	  v[2] = clamp(v[2], min, max);
+	  return v;
+  }
+
 #endif // !VEC3_H
 
 

@@ -15,9 +15,9 @@ int main()
 
     scene Sample_Scene;
     auto lights = make_shared<hitable_list>();
-    lights->add(make_shared<sphere>(point3(0, 1,  5), 0.25, shared_ptr<material>()));
-    lights->add(make_shared<sphere>(point3(0, 1, -5), 0.25, shared_ptr<material>()));
-    lights->add(make_shared<sphere>(point3(10, 1, 0), 0.25, shared_ptr<material>()));
+    lights->add(make_shared<spotlight>(point3(0, 1, 5), color(10, 10, 10), vec3(1, 0, 0)));
+    lights->add(make_shared<spotlight>(point3(0, 1, -5), color(10, 10, 10), vec3(1, 0, 0)));
+    lights->add(make_shared<spotlight>(point3(10, 1, 0), color(10, 10, 10), vec3(1, 0, 0)));
 
 
     auto pink = make_shared<lambertian>(color(0.9, 128 / 255, 192 / 255));
@@ -25,16 +25,14 @@ int main()
     auto glass = make_shared<dielectric>(1.3);
     /*Sample_Scene.cube("Cubo", metal_blue);*/
     Sample_Scene.nh_sphere("Piso", point3(0, -1001, 0), 1000.0, pink);
-    Sample_Scene.light("Lamp1", point3(0, 1, 5), color(10, 10, 10), vec3(1, 0, 0));
+    Sample_Scene.light("Lamp1", point3(0, 1, 5), color(10, 10, 10),  vec3(1,0,0));
     Sample_Scene.light("Lamp2", point3(0, 1, -5), color(10, 10, 10), vec3(1,0,0));
     Sample_Scene.light("Lamp3", point3(10, 1, 0), color(10, 10, 10), vec3(1,0,0));
-    /*Sample_Scene.move("Cubo", vec3(1.0, 1.0, 1.0));
-    Sample_Scene.rotate("Cubo", vec3(45, 0, 30));
-    Sample_Scene.scaling("Cubo", 2.0);*/
+   
 
     
     //Pentagono 
-    /*Mesh_Struct Penta; 
+    Mesh_Struct Penta; 
 
     Penta.position.push_back(point3(0.0, 0.0, 2.0)); 
     Penta.position.push_back(point3(0.0, 0.0, -2.0)); 
@@ -53,14 +51,17 @@ int main()
 
     auto pertext = make_shared<noise_texture>(6);
 
-    Sample_Scene.mesh("Pent", Penta.position, Penta.index_vertices, make_shared<lambertian>(pertext));*/
+    Sample_Scene.mesh("Pent", Penta.position, Penta.index_vertices, make_shared<lambertian>(pertext));
 
     auto chess = make_shared<checker_texture>(vec3(0.0, 0.0, 0.0), vec3(1.0, 1.0, 1.0));
-    Sample_Scene.loadMesh("cubo", "cube2.obj", make_shared<lambertian>(chess));
+    Sample_Scene.loadMesh("Cubo", "cube2.obj", make_shared<metal>(chess, 0.7));
+    //Sample_Scene.move("Cubo", vec3(1.0, 1.0, 1.0));
+    //Sample_Scene.rotate("Cubo", vec3(45, 0, 30));
+    //Sample_Scene.scaling("Cubo", 2.0);
 
-    Sample_Scene.nh_sphere("Esfera_vidrio", point3(2, 2, 2), 3, glass);
+    //Sample_Scene.nh_sphere("Esfera_vidrio", point3(2, 2, 2), 3, glass);
 
-    Sample_Scene.render("Something", "image3.ppm", 300, 300, point3(26, 3, 6), point3(0, 0, 0), vec3(0, 1, 0), 20.0, color(0.5, 0.5, 0.5), lights);
+    Sample_Scene.render("Something", "image3.ppm", 200, 100, point3(26, 3, 6), point3(0, 0, 0), vec3(0, 1, 0), 20.0, color(0, 0, 0), lights);
     
 
 

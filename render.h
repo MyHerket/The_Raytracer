@@ -52,33 +52,20 @@ color background(const ray& r) {
 }
 
 color ray_color(
-	const ray& r, 
-	const color& ambient,
-	const hitable& world, 
-	shared_ptr<hitable> lights, 
-	int depth, 
-	int first_depth) {
+	const ray& r, const color& ambient, const hitable& world, int depth, int first_depth) {
 	hit_record rec;
 	if (depth <= 0)
 		return ambient;
 
 	if (world.hit(r, 0.001, infinity, rec)) {
-		scatter_record srec; 
-		color emitted = rec.mat_ptr->emitted(r, rec, rec.u, rec.v, rec.p);
-		if (!rec.mat_ptr->scatter(r, rec, srec))
+		ray scattered;
+		color attenuation;
+		color emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
+
+		if (!rec.mat_ptr->scatter(r, rec, attenuation, scattered))
 			return emitted;
-		if (srec.is_specular)
-			return emitted
-			* ray_color(srec.specular_ray, ambient, world, lights, depth - 1, first_depth);
-		auto light_ptr = make_shared<hitable_pdf>(lights, rec.p);
-		mixture_pdf p(light_ptr, srec.pdf_ptr);
 
-		ray scattered = ray(rec.p, p.generate(), r.time());
-		auto pdf_val = p.value(scattered.direction());
-
-		return emitted + srec.attenuation * rec.mat_ptr->scattering_pdf(r, rec, scattered)
-			* ray_color(scattered, ambient, world, lights, depth - 1, first_depth) / pdf_val;
-	
+		return emitted + attenuation * ray_color(scattered, ambient, world, depth - 1, first_depth);
 	}
 	else if (depth == first_depth)
 		return background(r);
@@ -170,7 +157,7 @@ public:
 		const point3& up, double fov, const color& ambient, shared_ptr<hitable> lights) {
 		
 		//Other Parameters	
-		int samples_per_pixel = 200;
+		int samples_per_pixel = 100;
 		const int max_depth = 50;
 		auto aspect_ratio = w / h;
 		auto aperture = 0.0;
@@ -199,7 +186,7 @@ public:
 					auto v = (j + random_double()) / (h - 1.0);
 					ray r = cam.get_ray(u, v);
 					vec3 p = r.at(2.0);
-					pixel_color += ray_color(r, ambient, world, lights, max_depth, max_depth);
+					pixel_color += ray_color(r, ambient, world, max_depth, max_depth);
 				}
 				write_color(file, pixel_color, samples_per_pixel);
 
