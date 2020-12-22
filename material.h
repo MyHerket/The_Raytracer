@@ -11,10 +11,12 @@ struct scatter_record {
 	ray specular_ray; 
 	bool is_specular; 
 	color attenuation; 
-	shared_ptr<cosine_pdf> pdf_ptr;
+	shared_ptr<pdf> pdf_ptr;
 };
 
-struct hit_record; 
+struct hit_record;
+
+
 class material {
 public: 
 	virtual color emitted(
@@ -45,8 +47,7 @@ public:
 	)const override {
 		srec.is_specular = false; 
 		srec.attenuation = albedo->value(rec.u, rec.v, rec.p);
-		cosine_pdf cpdf(rec.normal); 
-		//srec.pdf_ptr = cpdf;
+		srec.pdf_ptr = make_shared<cosine_pdf>(rec.normal);
 		return true;
 
 	}
@@ -73,6 +74,7 @@ public:
 		srec.specular_ray = ray(rec.p, reflected + fuzz * random_in_unit_sphere());
 		srec.attenuation = albedo;
 		srec.is_specular = true; 
+		srec.pdf_ptr = 0;
 		return true;
 	}
 

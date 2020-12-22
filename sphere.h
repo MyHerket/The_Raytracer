@@ -12,7 +12,8 @@ public:
     sphere(const point3& cen, double r, shared_ptr<material> m, const char* _name = "Example") : name(_name), center(cen), radius(r), mat_ptr(m) {};
     virtual bool hit(const ray& r, double tmin, double tmax, hit_record& rec) const override;
     virtual bool bounding_box(double time0, double time1, aabb& output_box) const override;
-
+    virtual double pdf_value(const point3& o, const vec3& v) const override;
+    virtual vec3 random(const vec3& o) const override;
 
 public:
     const char* name;
@@ -69,6 +70,24 @@ bool sphere::bounding_box(double time0, double time1, aabb& output_box) const  {
     return true;
 }
 
+double sphere::pdf_value(const point3& o, const vec3& v) const {
+    hit_record rec; 
+    if (!this->hit(ray(o, v), 0.0001, infinity, rec))
+        return 0;
+    auto cos_theta_max = sqrt(1 - radius * radius / (center - o).lenght_squared());
+    auto solid_angle = 2 * pi * (1 - cos_theta_max); 
+
+    return 1 / solid_angle;
+}
+
+vec3 sphere::random(const point3& o)const {
+    vec3 direction = center - o; 
+    auto distance_squared = direction.lenght_squared();
+    onb uvw; 
+    uvw.build_from_w(direction); 
+    return uvw.local(random_to_sphere(radius, distance_squared));
+}
+
 
 class spotlight : public hitable {
 public:
@@ -76,7 +95,8 @@ public:
     spotlight(const point3& cen, const color& intensity, const vec3& attenuation, const char* _name = "Example") : name(_name), center(cen), mat_ptr(make_shared<diffuse_light_s>(intensity, attenuation, 0.25)) {};
     virtual bool hit(const ray& r, double tmin, double tmax, hit_record& rec) const override;
     virtual bool bounding_box(double time0, double time1, aabb& output_box) const override;
-
+    virtual double pdf_value(const point3& o, const vec3& v) const override;
+    virtual vec3 random(const vec3& o) const override;
 
 public:
     const char* name;
@@ -132,5 +152,24 @@ bool spotlight::bounding_box(double time0, double time1, aabb& output_box) const
         center + vec3(radius, radius, radius));
     return true;
 }
+
+double spotlight::pdf_value(const point3& o, const vec3& v) const {
+    hit_record rec;
+    if (!this->hit(ray(o, v), 0.0001, infinity, rec))
+        return 0;
+    auto cos_theta_max = sqrt(1 - radius * radius / (center - o).lenght_squared());
+    auto solid_angle = 2 * pi * (1 - cos_theta_max);
+
+    return 1 / solid_angle;
+}
+
+vec3 spotlight::random(const point3& o)const {
+    vec3 direction = center - o;
+    auto distance_squared = direction.lenght_squared();
+    onb uvw;
+    uvw.build_from_w(direction);
+    return uvw.local(random_to_sphere(radius, distance_squared));
+}
+
 
 #endif 

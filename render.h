@@ -42,8 +42,12 @@ color background(const ray& r) {
 }
 
 color ray_color(
-	const ray& r, const color& ambient, const hitable& world, 
-	const shared_ptr<hitable>& lights, int depth, int first_depth) {
+	const ray& r, 
+	const color& ambient,
+	const hitable& world, 
+	const shared_ptr<hitable_list>& lights, 
+	int depth, 
+	int first_depth) {
 	hit_record rec;
 	if (depth <= 0)
 		return ambient;
@@ -54,7 +58,8 @@ color ray_color(
 		if (!rec.mat_ptr->scatter(r, rec, srec))
 			return emitted;
 		if (srec.is_specular)
-			return srec.attenuation * ray_color(srec.specular_ray, ambient, world, lights, depth - 1, first_depth);
+			return srec.attenuation
+			* ray_color(srec.specular_ray, ambient, world, lights, depth - 1, first_depth);
 		auto light_ptr = make_shared<hitable_pdf>(lights, rec.p);
 		mixture_pdf p(light_ptr, srec.pdf_ptr);
 
@@ -72,15 +77,15 @@ color ray_color(
 	}
 }
 
-class gr {
+class scene {
 public: 
 	hitable_list world; 
 	ifstream in_file;
 	shared_ptr<material> def;
-	hitable_list Lamps;
+	shared_ptr<hitable_list> Lamps;
 
-	gr() {}
-	gr(const char* name, const shared_ptr<material> mtp) {
+	scene() {}
+	scene(const char* name, const shared_ptr<material> mtp) {
 		//Este archivo leerá los archivos lua y los interpretará para construir la escena.
 		string line;
 		in_file.open(name); 
@@ -114,7 +119,8 @@ public:
 
 	void light(const char* name, const point3& position, const color& intensity, const vec3& attenuation){
 		auto lamp = make_shared<spotlight>(position, intensity, attenuation, name);
-		Lamps.add(lamp);
+		//world.add(lamp);
+		Lamps->add(lamp);
 	}
 
 	void loadMesh(const char* name, const char* filename, const shared_ptr<material> mat) {
@@ -124,11 +130,11 @@ public:
 
 	void render(
 		const char* node, const char* filename, int w, int h, const point3& eye, const point3& view,
-		const point3& up, double fov, const color& ambient, vector<shared_ptr<hitable>> lights) {
+		const point3& up, double fov, const color& ambient, shared_ptr<hitable> lights) {
 		
 		//Other Parameters	
 		int samples_per_pixel = 200;
-		const int max_depth = 20;
+		const int max_depth = 50;
 		auto aspect_ratio = w / h;
 		auto aperture = 0.0;
 
@@ -138,7 +144,8 @@ public:
 
 		//Adding lights
 		for (const auto& lamps: lights) {
-			Lamps.add(lamps);
+			Lamps->add(lamps);
+			//world.add(lamps);
 		}
 
 		//Render
@@ -160,7 +167,7 @@ public:
 					auto v = (j + random_double()) / (h - 1.0);
 					ray r = cam.get_ray(u, v);
 					vec3 p = r.at(2.0);
-					pixel_color += ray_color(r, ambient, world, Lamps.objects[0], max_depth, max_depth);
+					pixel_color += ray_color(r, ambient, world, Lamps, max_depth, max_depth);
 				}
 				write_color(file, pixel_color, samples_per_pixel);
 
