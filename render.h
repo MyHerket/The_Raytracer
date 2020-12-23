@@ -76,21 +76,21 @@ color ray_color(
 		vec3 v = -r.direction();
 		vec3 R = unit_vector(reflect(v, rec.normal));
 		double cos_alpha;
-		double cos_theta;
+		//double cos_theta;
 		color intensity;
 		int exponent = 2.0;
-		double difuse_coef = rec.mat_ptr->difuse_coef();
+		//double difuse_coef = rec.mat_ptr->difuse_coef();
 
 		for (const auto& lamp : lights->objects) {
 			L = unit_vector(lamp->get_center());
 			intensity = lamp->get_intensity();
 			cos_alpha = dot(L, R);
-			cos_theta = dot(L, unit_vector(rec.normal));
+			//cos_theta = dot(L, unit_vector(rec.normal));
 			specular += specular_coef * pow(cos_alpha, exponent) * intensity;
-			difuse += difuse_coef * cos_theta * intensity;
+			//difuse += difuse_coef * cos_theta * intensity;
 		}
 
-		return emitted + difuse + specular;
+		return specular*rec.mat_ptr->scatter(r, rec, attenuation, scattered);
 	}
 	else if (depth == first_depth)
 		return background(r);
