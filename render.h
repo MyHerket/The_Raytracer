@@ -57,7 +57,7 @@ color ray_color2(
 	hit_record rec;
 	if (world.hit(r, 0.001, infinity, rec)) {
 		
-		//color emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
+		color emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
 		ray scattered;
 		color attenuation;
 		//Calculo de luz ambiente
@@ -87,7 +87,7 @@ color ray_color2(
 			difuse += difuse_coef * cos_theta * intensity;
 		}
 
-		return ambient+specular+difuse;
+		return emitted + ambient + specular + difuse;
 	}
 	else if (depth == first_depth)
 		return background(r);
