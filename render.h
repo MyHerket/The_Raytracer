@@ -125,14 +125,14 @@ color ray_color(
 
 		for (const auto& lamp : lights->objects) {
 			L = unit_vector(lamp->get_center());
-			intensity = lamp->get_intensity();
+			intensity = lamp->get_intensity()/10;
 			cos_alpha = dot(L, R);
 			cos_theta = dot(L, unit_vector(rec.normal));
 			specular += specular_coef * pow(cos_alpha, exponent) * intensity;
 			difuse += difuse_coef * cos_theta * intensity;
 		}
 
-		return (difuse + specular + attenuation * rec.mat_ptr->scatter(r, rec, attenuation, scattered))- vec3(2, 2, 2);
+		return (difuse + specular + ambient*attenuation * rec.mat_ptr->scatter(r, rec, attenuation, scattered));
 	}
 	else if (depth == first_depth)
 		return background(r);
