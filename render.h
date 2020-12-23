@@ -132,7 +132,7 @@ color ray_color(
 			difuse += difuse_coef * cos_theta * intensity;
 		}
 
-		color first_sample = (difuse + specular + attenuation * rec.mat_ptr->scatter(r, rec, attenuation, scattered))-vec3(1.5,1.5,1.5);
+		color first_sample = (difuse + specular + attenuation * rec.mat_ptr->scatter(r, rec, attenuation, scattered))-vec3(1,1,1); //Aqui agregue esto porque la escena es demasiado blanca
 		vec3 a(clamp(first_sample[0], 0, 1.0), clamp(first_sample[1], 0, 1.0), clamp(first_sample[2], 0, 1.0));
 		return a;
 	} 

@@ -68,8 +68,9 @@ int main()
     //Ball.light("orange_light", point3(400, 100, 150), color(0.7, 0.0, 0.7), vec3(1, 0, 0));
     //Ball.loadMesh("Dodecahedron", "smstdodeca.obj", mat3);
     Mesh_Struct OBJMesh = loadOBJ("smstdodeca.obj");
-    auto Dode = make_shared<malla>(OBJMesh.position, OBJMesh.index_vertices, mat3, "Dodeca");
-    Dode = make_shared<translate>(Dode, point3(200, 200, 200));
+    shared_ptr<hitable> Dode = make_shared<malla>(OBJMesh.position, OBJMesh.index_vertices, mat3, "Dodeca");
+    Dode = make_shared<translate>(Dode, point3(0, 0, -200));
+    Dode = make_shared<scale>(Dode, 100);
     Ball.add("Dodeca", Dode);
 
 
