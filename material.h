@@ -17,6 +17,13 @@ public:
     virtual bool scatter(
         const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered
     ) const = 0;
+
+    virtual double specular_coef()const {
+        return 0.0;
+    }
+    virtual double difuse_coef()const {
+        return 0.0;
+    }
 };
 
 
@@ -73,15 +80,16 @@ public:
     virtual bool scatter(
         const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered
     ) const override {
-        double exp = 2; 
-        vec3 v = -(r_in.origin()-rec.p)* (r_in.origin() - rec.p).lenght();
-        vec3 L = unit_vector(r_in.direction());
         vec3 reflected = reflect(unit_vector(r_in.direction()), rec.normal);
-        vec3 R = reflect(v, rec.normal);
-        double cos_alpha = rec.u;
-        scattered = ray(rec.p, reflected + K_rd * random_in_unit_sphere(), r_in.time()); 
+        scattered = ray(rec.p, reflected + K_rd * random_in_unit_sphere(), r_in.time());
         attenuation = albedo->value(rec.u, rec.v, rec.p);
         return (dot(scattered.direction(), rec.normal) > 0);
+    }
+    virtual double specular_coef() const override{
+        return K_rs;
+    }
+    virtual double difuse_coef() const override {
+        return K_rd;
     }
 
 public:

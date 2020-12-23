@@ -21,9 +21,9 @@ int main()
 
 
     auto pink = make_shared<lambertian>(color(0.9, 128 / 255, 192 / 255));
-    auto metal_blue = make_shared<metal>(color(0.05, 0.05, 0.7), 1.0);
+    auto metal_blue = make_shared<Phong_material>(color(0.05, 0.05, 0.7), 1.0, 0.02);
     auto glass = make_shared<dielectric>(1.3);
-    /*Sample_Scene.cube("Cubo", metal_blue);*/
+    Sample_Scene.cube("Cubo", metal_blue);
     Sample_Scene.nh_sphere("Piso", point3(0, -1001, 0), 1000.0, pink);
     Sample_Scene.light("Lamp1", point3(0, 1, 5), color(10, 10, 10),  vec3(1,0,0));
     Sample_Scene.light("Lamp2", point3(0, 1, -5), color(10, 10, 10), vec3(1,0,0));
@@ -32,7 +32,7 @@ int main()
 
     
     //Pentagono 
-    Mesh_Struct Penta; 
+    /*Mesh_Struct Penta; 
 
     Penta.position.push_back(point3(0.0, 0.0, 2.0)); 
     Penta.position.push_back(point3(0.0, 0.0, -2.0)); 
@@ -54,10 +54,10 @@ int main()
     Sample_Scene.mesh("Pent", Penta.position, Penta.index_vertices, make_shared<lambertian>(pertext));
 
     auto chess = make_shared<checker_texture>(vec3(0.0, 0.0, 0.0), vec3(1.0, 1.0, 1.0));
-    Sample_Scene.loadMesh("Cubo", "cube2.obj", make_shared<metal>(chess, 0.7));
-    //Sample_Scene.move("Cubo", vec3(1.0, 1.0, 1.0));
-    //Sample_Scene.rotate("Cubo", vec3(45, 0, 30));
-    //Sample_Scene.scaling("Cubo", 2.0);
+    Sample_Scene.loadMesh("Cubo", "cube2.obj", make_shared<metal>(chess, 0.7));*/
+    Sample_Scene.move("Cubo", vec3(1.0, 1.0, 1.0));
+    Sample_Scene.rotate("Cubo", vec3(45, 0, 30));
+    Sample_Scene.scaling("Cubo", 2.0);
 
     //Sample_Scene.nh_sphere("Esfera_vidrio", point3(2, 2, 2), 3, glass);
 

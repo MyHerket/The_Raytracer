@@ -18,6 +18,9 @@ public:
         return name;
     }
 
+    virtual vec3 get_center()const override {
+        return center;
+    }
 public:
     const char* name;
     point3 center;
@@ -95,7 +98,7 @@ vec3 sphere::random(const point3& o)const {
 class spotlight : public hitable {
 public:
     spotlight() {}
-    spotlight(const point3& cen, const color& intensity, const vec3& attenuation, const char* _name = "Example") : name(_name), center(cen), mat_ptr(make_shared<diffuse_light_s>(intensity, attenuation, 0.25)) {};
+    spotlight(const point3& cen, const color& intensity, const vec3& attenuation, const char* _name = "Example") : inten(intensity), name(_name), center(cen), mat_ptr(make_shared<diffuse_light_s>(intensity, attenuation, 0.25)) {};
     virtual bool hit(const ray& r, double tmin, double tmax, hit_record& rec) const override;
     virtual bool bounding_box(double time0, double time1, aabb& output_box) const override;
     virtual double pdf_value(const point3& o, const vec3& v) const override;
@@ -103,12 +106,19 @@ public:
     virtual const char* get_name()const override {
         return name;
     }
+    virtual vec3 get_center()const override {
+        return center;
+    }
+    virtual color get_intensity()const override {
+        return inten;
+    }
 
 public:
     const char* name;
     point3 center;
     double radius = 0.25;
     shared_ptr<material> mat_ptr;
+    color inten;
 
 private:
     static void get_spotlight_uv(const point3& p, double& u, double& v) {

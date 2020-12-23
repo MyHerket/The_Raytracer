@@ -35,6 +35,12 @@ public:
 	virtual const char* get_name()const {
 		return "NULL";
 	}
+	virtual vec3 get_center()const {
+		return vec3(0, 0, 0);
+	}
+	virtual color get_intensity()const {
+		return color(0, 0, 0);
+	}
 };
 
 

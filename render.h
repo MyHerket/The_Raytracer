@@ -52,7 +52,7 @@ color background(const ray& r) {
 }
 
 color ray_color(
-	const ray& r, const color& ambient, const hitable& world, int depth, int first_depth) {
+	const ray& r, const color& ambient, const hitable& world, int depth, int first_depth, shared_ptr<hitable_list> lights) {
 	hit_record rec;
 	if (depth <= 0)
 		return ambient;
@@ -65,7 +65,32 @@ color ray_color(
 		if (!rec.mat_ptr->scatter(r, rec, attenuation, scattered))
 			return emitted;
 
-		return emitted + attenuation * ray_color(scattered, ambient, world, depth - 1, first_depth);
+		double specular_coef = rec.mat_ptr->specular_coef();
+		if (specular_coef <= 0.0001)
+			return emitted + attenuation * ray_color(scattered, ambient, world, depth - 1, first_depth, lights);
+
+		//Calculo de luz especular
+		color specular(0, 0, 0);
+		color difuse(0, 0, 0);
+		point3 L;
+		vec3 v = -r.direction();
+		vec3 R = unit_vector(reflect(v, rec.normal));
+		double cos_alpha;
+		double cos_theta;
+		color intensity;
+		int exponent = 2.0;
+		double difuse_coef = rec.mat_ptr->difuse_coef();
+
+		for (const auto& lamp : lights->objects) {
+			L = unit_vector(lamp->get_center());
+			intensity = lamp->get_intensity();
+			cos_alpha = dot(L, R);
+			cos_theta = dot(L, unit_vector(rec.normal));
+			specular += specular_coef * pow(cos_alpha, exponent) * intensity;
+			difuse += difuse_coef * cos_theta * intensity;
+		}
+
+		return emitted + difuse + specular;
 	}
 	else if (depth == first_depth)
 		return background(r);
@@ -154,7 +179,7 @@ public:
 
 	void render(
 		const char* node, const char* filename, int w, int h, const point3& eye, const point3& view,
-		const point3& up, double fov, const color& ambient, shared_ptr<hitable> lights) {
+		const point3& up, double fov, const color& ambient, shared_ptr<hitable_list> lights) {
 		
 		//Other Parameters	
 		int samples_per_pixel = 100;
@@ -186,7 +211,7 @@ public:
 					auto v = (j + random_double()) / (h - 1.0);
 					ray r = cam.get_ray(u, v);
 					vec3 p = r.at(2.0);
-					pixel_color += ray_color(r, ambient, world, max_depth, max_depth);
+					pixel_color += ray_color(r, ambient, world, max_depth, max_depth, lights);
 				}
 				write_color(file, pixel_color, samples_per_pixel);
 
