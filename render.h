@@ -20,6 +20,7 @@
 #include "Camera.h"
 #include "color.h"
 #include "OBJLoader.h"
+#include "Bounding_Volume_Tree.h"
 
 using namespace std;
 
@@ -51,47 +52,6 @@ color background(const ray& r) {
 
 }
 
-color ray_color2(
-	const ray& r, const color& ambient, const hitable& world, int depth, int first_depth, shared_ptr<hitable_list> lights
-) {
-	hit_record rec;
-	if (world.hit(r, 0.001, infinity, rec)) {
-		
-		color emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
-		ray scattered;
-		color attenuation;
-		//Calculo de luz ambiente
-		rec.mat_ptr->scatter(r, rec, attenuation, scattered);
-		color ambient = rec.mat_ptr->ambient_coef() * ambient * attenuation;
-
-
-		//Calculo de luz especular y difusa
-		color specular(0, 0, 0);
-		color difuse(0, 0, 0);
-		point3 L;
-		vec3 v = -r.direction();
-		vec3 R = unit_vector(reflect(v, rec.normal));
-		double cos_alpha;
-		double cos_theta;
-		color intensity;
-		int exponent = 2.0;
-		double difuse_coef = rec.mat_ptr->difuse_coef();
-		double specular_coef = rec.mat_ptr->specular_coef();
-
-		for (const auto& lamp : lights->objects) {
-			L = unit_vector(lamp->get_center());
-			intensity = lamp->get_intensity();
-			cos_alpha = dot(L, R);
-			cos_theta = dot(L, unit_vector(rec.normal));
-			specular += specular_coef * pow(cos_alpha, exponent) * intensity;
-			difuse += difuse_coef * cos_theta * intensity;
-		}
-
-		return emitted + ambient + specular + difuse;
-	}
-	else if (depth == first_depth)
-		return background(r);
-}
 
 color ray_color(
 	const ray& r, const color& ambient, const hitable& world, int depth, int first_depth, shared_ptr<hitable_list> lights) {
@@ -238,7 +198,8 @@ public:
 		auto disk_to_focus = 10.0;
 		camera cam(eye,view, up, fov, aspect_ratio, aperture, disk_to_focus, 0.0, 1.0);
 
-
+		bvh_node world2(world, 0.0, 1.0);
+		
 		//Render
 
 		std::ofstream file(filename);
@@ -258,7 +219,7 @@ public:
 					auto v = (j + random_double()) / (h - 1.0);
 					ray r = cam.get_ray(u, v);
 					vec3 p = r.at(2.0);
-					pixel_color += ray_color(r, ambient, world, max_depth, max_depth, lights);
+					pixel_color += ray_color(r, ambient, world2, max_depth, max_depth, lights);
 				}
 				write_color(file, pixel_color, samples_per_pixel);
 
@@ -268,49 +229,6 @@ public:
 
 
 		std::cout << "\nDone\n";
-	}
-	void render2(
-		const char* node, const char* filename, int w, int h, const point3& eye, const point3& view,
-		const point3& up, double fov, const color& ambient, shared_ptr<hitable_list> lights) {
-
-		//Other Parameters	
-		int samples_per_pixel = 200;
-		const int max_depth = 50;
-		auto aspect_ratio = w / h;
-		auto aperture = 0.0;
-
-		//Setup Camera
-		auto disk_to_focus = 10.0;
-		camera cam(eye, view, up, fov, aspect_ratio, aperture, disk_to_focus, 0.0, 1.0);
-
-
-		//Render
-
-		std::ofstream file(filename);
-		if (!file.is_open()) {
-			std::cout << "Error de apertura de archivo\n";
-			exit(1);
-		}
-
-		file << "P3\n" << w << " " << h << "\n255\n";
-
-		for (int j = h - 1; j >= 0; --j) {
-			std::cout << "\rScanlines remaining: " << j << " " << std::flush;
-			for (int i = 0; i < w; ++i) {
-				color pixel_color(0.0, 0.0, 0.0);
-				for (int s = 0; s < samples_per_pixel; ++s) {
-					auto u = (i + random_double()) / (w - 1.0);
-					auto v = (j + random_double()) / (h - 1.0);
-					ray r = cam.get_ray(u, v);
-					vec3 p = r.at(2.0);
-					pixel_color += ray_color2(r, ambient, world, max_depth, max_depth, lights);
-				}
-				write_color(file, pixel_color, samples_per_pixel);
-
-			}
-		}
-
-		std::cout << "\nDone\n";
-	}
+	} 
 };
 #endif // !RENDER_H
