@@ -97,7 +97,7 @@ color ray_color(
 	const ray& r, const color& ambient, const hitable& world, int depth, int first_depth, shared_ptr<hitable_list> lights) {
 	hit_record rec;
 	if (depth <= 0)
-		return ambient;
+		return vec3(0,0,0);
 
 	if (world.hit(r, 0.001, infinity, rec)) {
 		ray scattered;
@@ -132,12 +132,12 @@ color ray_color(
 			difuse += difuse_coef * cos_theta * intensity;
 		}
 
-		return (difuse + specular + ambient*attenuation * rec.mat_ptr->scatter(r, rec, attenuation, scattered));
+		return (difuse + specular + ambient * (emitted + attenuation * rec.mat_ptr->scatter(r, rec, attenuation, scattered)));
 	}
 	else if (depth == first_depth)
 		return background(r);
 	else {
-		return ambient;
+		return vec3(0,0,0);
 	}
 }
 
