@@ -24,8 +24,41 @@ public:
     virtual double difuse_coef()const {
         return 0.0;
     }
+    virtual double ambient_coef()const {
+        return 0.0;
+    }
 };
 
+class basic : public material {
+public:
+    basic(const color& a, double Krd, double Krs, double Kra) : albedo(make_shared<solid_color>(a)), K_rd(Krd < 1 ? Krd : 1), K_rs(Krs < 1 ? Krs : 1), K_ra(Kra < 1 ? Kra : 1) {}
+    basic(shared_ptr<texture> a, double Krd, double Krs, double Kra) : albedo(a), K_rd(Krd < 1 ? Krd : 1), K_rs(Krs < 1 ? Krs : 1), K_ra(Kra < 1 ? Kra : 1) {}
+
+    virtual bool scatter(
+        const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered
+    ) const override {
+        vec3 reflected = reflect(unit_vector(r_in.direction()), rec.normal);
+        scattered = ray(rec.p, reflected + K_rd * random_in_unit_sphere(), r_in.time());
+        attenuation = albedo->value(rec.u, rec.v, rec.p);
+        return (dot(scattered.direction(), rec.normal) > 0);
+    }
+    virtual double specular_coef() const override {
+        return K_rs;
+    }
+    virtual double difuse_coef() const override {
+        return K_rd;
+    }
+    virtual double ambient_coef() const override {
+        return K_ra;
+    }
+
+
+public:
+    shared_ptr<texture> albedo;
+    double K_rd;
+    double K_rs;
+    double K_ra;
+};
 
 class lambertian : public material {
 public:
