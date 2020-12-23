@@ -46,7 +46,7 @@ int main()
     Sample_Scene.nh_box("Cubo", point3(10,0,1), 1.0, metal_red);
     Sample_Scene.nh_box("Cubo_cristal", point3(10.1,0.1,1.1), 1.1, make_shared<dielectric>(1.3));
 
-    Sample_Scene.render("Something", "image3.ppm", 600, 300, point3(26, 3, 6), point3(0, 2, 0), vec3(0, 1, 0), 20.0, color(0.1, 0.1, 0.1), lights);
+    Sample_Scene.render("Something", "image3.ppm", 1200, 600, point3(26, 3, 6), point3(0, 2, 0), vec3(0, 1, 0), 20.0, color(0.1, 0.1, 0.1), lights);
     
 
 
