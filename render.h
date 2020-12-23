@@ -274,7 +274,7 @@ public:
 		const point3& up, double fov, const color& ambient, shared_ptr<hitable_list> lights) {
 
 		//Other Parameters	
-		int samples_per_pixel = 100;
+		int samples_per_pixel = 200;
 		const int max_depth = 50;
 		auto aspect_ratio = w / h;
 		auto aperture = 0.0;

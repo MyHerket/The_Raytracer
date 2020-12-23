@@ -77,7 +77,7 @@ int main()
     auto light = make_shared<hitable_list>(make_shared<spotlight>(point3(2,2,2), color(4, 4,4), vec3(1, 0, 0)));
     light->add(make_shared<spotlight>(point3(400, 100, 150), color(0.7, 0.0, 0.7), vec3(1, 0, 0)));
 
-    Ball.render("Scene", "nonhier.ppm", 256, 256, point3(0, 0, 800), point3(0, 0, -1), vec3(0, 1, 0), 50.0, color(0.3, 0.3, 0.3), light);
+    Ball.render("Scene", "nonhier.ppm", 500, 500, point3(0, 0, 800), point3(0, 0, -1), vec3(0, 1, 0), 50.0, color(0.3, 0.3, 0.3), light);
     
 
 
