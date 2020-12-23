@@ -51,7 +51,7 @@ int main()
     Sample_Scene.render("Something", "image3.ppm", 600, 300, point3(26, 3, 6), point3(0, 2, 0), vec3(0, 1, 0), 20.0, color(0.1, 0.1, 0.1), lights);*/
 
     scene Ball;
-    Ball.nh_sphere("Ball", point3(0, 0, 0), 1, make_shared<basic>(color(0.7, 1.0, 0.7), 0.5, 0.7, 0.5));
+    Ball.nh_sphere("Ball", point3(0, 0, 0), 1, make_shared<basic>(color(0.0, 1.0, 0.0), 0.5, 0.7, 0.5));
     Ball.light("Lamp1", point3(2, 2, 2), color(4, 4, 4), vec3(1, 0, 0));
     auto light = make_shared<hitable_list>(make_shared<spotlight>(point3(2,2,2), color(4, 4,4), vec3(1, 0, 0)));
     Ball.render("Scene", "Ball.ppm", 400, 200, point3(26, 3, 6), point3(0, 0, 0), vec3(0, 1, 0), 20.0, color(0.1, 0.1, 0.1), light);
