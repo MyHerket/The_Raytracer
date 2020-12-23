@@ -125,14 +125,14 @@ color ray_color(
 
 		for (const auto& lamp : lights->objects) {
 			L = unit_vector(lamp->get_center());
-			intensity = lamp->get_intensity()/10;
+			intensity = lamp->get_intensity();
 			cos_alpha = dot(L, R);
 			cos_theta = dot(L, unit_vector(rec.normal));
 			specular += specular_coef * pow(cos_alpha, exponent) * intensity;
 			difuse += difuse_coef * cos_theta * intensity;
 		}
 
-		color first_sample = (difuse + specular + attenuation * rec.mat_ptr->scatter(r, rec, attenuation, scattered))-vec3(0.85,0.85,0.85);
+		color first_sample = (difuse + specular + attenuation * rec.mat_ptr->scatter(r, rec, attenuation, scattered))-vec3(1.5,1.5,1.5);
 		vec3 a(clamp(first_sample[0], 0, 1.0), clamp(first_sample[1], 0, 1.0), clamp(first_sample[2], 0, 1.0));
 		return a;
 	} 
@@ -230,7 +230,7 @@ public:
 		
 		//Other Parameters	
 		int samples_per_pixel =100;
-		const int max_depth = 50;
+		const int max_depth = 1;
 		auto aspect_ratio = w / h;
 		auto aperture = 0.0;
 
