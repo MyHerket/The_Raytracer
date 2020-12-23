@@ -36,10 +36,10 @@ struct compare
 
 color background(const ray& r) {
 	vec3 unit_direction = unit_vector(r.direction());
-	auto t = 0.5 * (unit_direction.z() + 1.0);
+	auto t = -unit_direction.y();
 	color back3(0.6, 0.0, 0.3);
 	color back1(0, 0, 0);
-	color back2(0.34, 0.13, 0.4);
+	color back2(0.2, 0., 0.7);
 
 	if (t <= 0.5) {
 		return (1.0 - 2 * t) * back1 + 2 * t * back2;
@@ -121,6 +121,9 @@ public:
 		def = mtp;
 	}
 
+	void add(const char* name, const shared_ptr<hitable> obj) {
+		world.add(obj);
+	}
 
 	void nh_box(const char* name, const point3& corner, const double r, const shared_ptr<material> mat) {
 		world.add(make_shared<box>(corner, corner + r, mat, name));
@@ -150,7 +153,7 @@ public:
 	}
 
 	int find(const char* name) {
-		auto itr = find_if(world.objects.cbegin(), world.objects.cend(), compare("name"));
+		auto itr = find_if(world.objects.cbegin(), world.objects.cend(), compare(name));
 
 		if (itr != world.objects.cend()) {
 			return distance(world.objects.cbegin(), itr);
@@ -182,7 +185,7 @@ public:
 		const point3& up, double fov, const color& ambient, shared_ptr<hitable_list> lights) {
 		
 		//Other Parameters	
-		int samples_per_pixel = 100;
+		int samples_per_pixel =100;
 		const int max_depth = 50;
 		auto aspect_ratio = w / h;
 		auto aperture = 0.0;

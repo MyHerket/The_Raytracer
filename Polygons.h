@@ -19,7 +19,7 @@ public:
 		point3 min(fmin(fmin(v1.x(), v2.x()), v3.x()), fmin(fmin(v1.y(), v2.y()), v3.y()), fmin(fmin(v1.z(), v2.z()), v3.z()));
 		point3 max(fmax(fmax(v1.x(), v2.x()), v3.x()), fmax(fmax(v1.y(), v2.y()), v3.y()), fmax(fmax(v1.z(), v2.z()), v3.z()));
 
-		auto outward_normal = unit_vector(cross((v2 - v1), (v3 - v1)));
+		auto outward_normal = -unit_vector(cross((v2 - v1), (v3 - v1)));
 		if (outward_normal*outward_normal == vec3(1, 0, 0)){
 			min += vec3(-0.0001, 0, 0);
 			max += vec3(0.0001, 0, 0);
